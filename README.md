@@ -8,7 +8,7 @@ from sklearn import datasets
 from sklearn.tree import DecisionTreeClassifier
 
 
-X, y = datasets.load_breast_cancer()
+X, y = datasets.load_breast_cancer(return_X_y=True)
 
 # DPDT
 clf = DPDTree(max_depth=3)
