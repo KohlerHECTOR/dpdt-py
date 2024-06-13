@@ -1,25 +1,26 @@
 from setuptools import setup, find_packages
 
-# Read the requirements from the requirements.txt file
-with open('requirements.txt') as f:
-    required = f.read().splitlines()
+__version__ = '0.1.1'
+
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 
 setup(
-    name='pydpdt',
-    version='0.1.0',
+    name='dpdt-py',
+    version=__version__,
     author='Hector Kohler',
     author_email='hector.kohler@inria.fr',
-    description='Dynamic Programming Decision Tree',
-    long_description=open('README.md').read(),
-    long_description_content_type='text/markdown',
-    url='https://github.com/KohlerHECTOR/pydpdt',  # Replace with your project's URL
-    packages=find_packages(),  # Automatically find packages in your project
+    packages=find_packages(),
+    # package_data={'': extra_files},
     include_package_data=True,
-    install_requires=required,  # List of dependencies
-    classifiers=[
-        'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License',  # Change the license if needed
-        'Operating System :: OS Independent',
-    ],
-    python_requires='>=3.6',
+    # package_dir={'':'src'},
+    url='https://github.com/KohlerHECTOR/dpdt-py',
+    description='Dynamic Programming Decision Tree',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    install_requires=[
+        "scikit-learn"
+    ]
 )
