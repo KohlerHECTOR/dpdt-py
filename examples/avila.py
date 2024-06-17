@@ -7,7 +7,7 @@ from time import time
 
 def get_occupancy_data(test=False):
     # Opening JSON file
-    with open("tests/data/big_data/avila.json") as json_file:
+    with open("classification_datasets/avila.json") as json_file:
         data = json.load(json_file)
     if test:
         return np.array(data["Xtest"]), np.array(data["Ytest"])
@@ -23,7 +23,7 @@ def count_avg_test_cart(clf: DecisionTreeClassifier, X):
 # Train
 X, y = get_occupancy_data()
 # DPDT
-clf_dpdt = DPDTree(max_depth=3)
+clf_dpdt = DPDTree(max_depth=3, max_nb_trees=20)
 clf_dpdt.fit(X, y)
 print(clf_dpdt.score(X, y))
 #CART
@@ -36,7 +36,7 @@ X_test, y_test = get_occupancy_data(test=True)
 
 t = time()
 scores, avg_nb_tests = np.zeros_like(clf_dpdt.zetas), np.zeros_like(clf_dpdt.zetas)
-for z in range(0, len(clf_dpdt.zetas), 50):
+for z in range(len(clf_dpdt.zetas)):
     scores[z], avg_nb_tests[z] = clf_dpdt.average_traj_length_in_mdp(X_test,y_test,zeta=z)
 time_pareto_front = time()-t
 
@@ -63,5 +63,5 @@ plt.xlabel("Test Accuracy")
 plt.ylabel("Average decision path length")
 plt.title("Pareto Front - Avila")
 plt.legend()
-plt.show()
+plt.savefig("avila.png")
 

@@ -4,7 +4,7 @@ import json
 
 def get_occupancy_data(test=False):
     # Opening JSON file
-    with open("tests/data/big_data/occupancy.json") as json_file:
+    with open("classification_datasets/occupancy.json") as json_file:
         data = json.load(json_file)
     if test:
         return np.array(data["Xtest"]), np.array(data["Ytest"])
@@ -100,5 +100,5 @@ def test_pareto_front():
     clf.fit(S, Y)
     S, Y = get_occupancy_data(test=True)
     scores, avg_nb_tests = np.zeros_like(clf.zetas), np.zeros_like(clf.zetas)
-    for z in range(0, len(clf.zetas), 50):
+    for z in range(len(clf.zetas)):
         scores[z], avg_nb_tests[z] = clf.average_traj_length_in_mdp(S, Y,zeta=z)

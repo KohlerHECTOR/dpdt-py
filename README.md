@@ -1,3 +1,5 @@
+## Quickstart
+
 ```bash
 pip install -e .
 ```
@@ -20,3 +22,7 @@ clf = DecisionTreeClassifier(max_depth=3)
 clf.fit(X,y)
 print(clf.score(X, y))
 ```
+
+## DPDT is used to find trees that generalize at least as well as CART trees but that have shorter decision path in average. 
+
+![Avila](examples/avila.png)
