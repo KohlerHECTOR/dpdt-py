@@ -54,7 +54,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
     init_o : array-like
         The initial observation of the MDP.
 
-    
+
     Examples
     --------
     >>> from dpdt import DPDTree
@@ -71,17 +71,17 @@ class DPDTree(ClassifierMixin, BaseEstimator):
     >>> clf.fit(X,y)
     >>> print(clf.score(X, y))
     """
+
     _parameter_constraints = {
         "max_depth": [Interval(Integral, 2, None, closed="left")],
         "max_nb_trees": [Interval(Integral, 1, None, closed="left")],
-        "cart_nodes_list": ["array-like"]
+        "cart_nodes_list": ["array-like"],
     }
 
     def __init__(self, max_depth=3, max_nb_trees=1000, cart_nodes_list=(3,)):
         self.max_nb_trees = max_nb_trees
         self.max_depth = max_depth
         self.cart_nodes_list = cart_nodes_list
-
 
     def build_mdp(self):
         """
@@ -210,7 +210,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             else:
                 break
         return deci_nodes
-    
+
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y):
         """
@@ -357,7 +357,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             / len(X),
             lengths.mean(),
         )
-    
+
     def get_pareto_front(self, X, y):
         """
         Compute the decision path lengths / test accuracy pareto front of DPDTrees.
@@ -379,6 +379,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         scores = np.zeros(X.shape[0])
         decision_path_length = np.zeros(X.shape[0])
         for z in range(len(self.zetas_)):
-            scores[z], decision_path_length[z] = self.average_traj_length_in_mdp_(X,y,z)
+            scores[z], decision_path_length[z] = self.average_traj_length_in_mdp_(
+                X, y, z
+            )
         return scores, decision_path_length
-

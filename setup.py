@@ -1,25 +1,29 @@
 from setuptools import setup, find_packages
+import os
 
-__version__ = "0.1.1"
+ver_file = os.path.join("adastop", "_version.py")
+with open(ver_file) as f:
+    exec(f.read())
+
+packages = find_packages(exclude=["tests", "examples",])
 
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
 setup(
-    name="dpdt-py",
+    name='dpdt',
     version=__version__,
-    author="Hector Kohler",
-    author_email="hector.kohler@inria.fr",
-    python_requires=">=3.8",
-    packages=find_packages(),
-    # package_data={'': extra_files},
+    license="MIT",
+    packages=packages,
     include_package_data=True,
-    # package_dir={'':'src'},
-    url="https://github.com/KohlerHECTOR/dpdt-py",
-    description="Dynamic Programming Decision Tree",
+    python_requires=">=3.8",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    install_requires=["scikit-learn", "pytest-cov"],
+    author="Hector Kohler",
+    author_email="hector.kohler@inria.fr",
+    install_requires=[
+        "scikit-learn"
+    ],
 )

@@ -23,7 +23,10 @@ def count_avg_test_cart(clf: DecisionTreeClassifier, X):
 
 
 print("downloading occupancy data ...")
-urllib.request.urlretrieve("https://raw.githubusercontent.com/KohlerHECTOR/dpdt-py/main/classification_datasets/occupancy.json", "classification_datasets/occupancy.json")
+urllib.request.urlretrieve(
+    "https://raw.githubusercontent.com/KohlerHECTOR/dpdt-py/main/classification_datasets/occupancy.json",
+    "classification_datasets/occupancy.json",
+)
 
 # Train
 X, y = get_occupancy_data()

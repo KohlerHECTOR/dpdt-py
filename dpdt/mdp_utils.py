@@ -14,6 +14,7 @@ class State:
     is_terminal : bool, default=False
         Indicates if the state is a terminal state.
     """
+
     def __init__(self, label, nz, is_terminal=False):
         self.obs = label
         self.actions = []
@@ -43,6 +44,7 @@ class Action:
     action : object
         The action representation (e.g., a split decision).
     """
+
     def __init__(self, action):
         self.action = action
         self.rewards = []
