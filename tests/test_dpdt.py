@@ -92,3 +92,9 @@ def test_real_data_one_tree():
 
     clf.fit(S, Y)
     clf.score(S, Y)
+
+
+def test_pareto_front():
+    S, Y = get_occupancy_data()
+    clf = DPDTree(3, cart_nodes_list=[16,8])
+    S, Y = get_occupancy_data(test=True)
