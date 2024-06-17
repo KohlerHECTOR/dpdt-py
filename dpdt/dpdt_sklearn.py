@@ -359,6 +359,23 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         )
     
     def get_pareto_front(self, X, y):
+        """
+        Compute the decision path lengths / test accuracy pareto front of DPDTrees.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input samples.
+        y : array-like of shape (n_samples,)
+            The target values.
+
+        Returns
+        -------
+        scores : array-like of shape (n_samples)
+            The test accuracies of the trees.
+        decision_path_length : array-like of shape (n_samples)
+            The average number of decision nodes traversal in each tree.
+        """
         scores = np.zeros(X.shape[0])
         decision_path_length = np.zeros(X.shape[0])
         for z in range(len(self.zetas_)):
