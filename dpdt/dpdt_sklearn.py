@@ -7,8 +7,7 @@ from .mdp_utils import backward_induction_multiple_zetas, Action, State
 
 
 class DPDTree(ClassifierMixin, BaseEstimator):
-
-    def __init__(self, max_depth: int, max_nb_trees: int = 1000, cart_nodes_list: list[int] = [3]):
+    def __init__(self, max_depth, max_nb_trees=1000, cart_nodes_list=[3]):
         self.max_nb_trees = max_nb_trees
         self.max_depth = max_depth
         self.cart_nodes_list = cart_nodes_list
@@ -110,7 +109,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
     def predict(self, X):
         return self.predict_zeta_(X, -1)
     
-    def predict_zeta_(self, X, zeta_index:int):
+    def predict_zeta_(self, X, zeta_index):
         # Check if fit has been called
         check_is_fitted(self)
 
@@ -136,7 +135,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
     
 
     
-    def average_traj_length_in_mdp(self, X, y, zeta:int):
+    def average_traj_length_in_mdp(self, X, y, zeta):
         nb_features = X.shape[1]
         init_a = self.trees[tuple(self.init_o.tolist() + [0])][zeta]
         lengths = np.zeros(X.shape[0])

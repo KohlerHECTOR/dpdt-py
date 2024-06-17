@@ -3,7 +3,7 @@ from binarytree import Node
 
 
 class InfoNode(Node):
-    def __init__(self, feature: int, threshold: float, left, right):
+    def __init__(self, feature, threshold, left, right):
         super().__init__("x_" + str(feature) + "≤" + str(round(threshold, 3)))
         self.feature = feature
         self.threshold = threshold
@@ -12,12 +12,12 @@ class InfoNode(Node):
 
 
 class ActionNode(Node):
-    def __init__(self, classif: int):
+    def __init__(self, classif):
         self.classif = classif
         super().__init__("C_" + str(classif))
 
 
-def extract_tree(policy: dict, root: list, H: int = 0, zeta: int = 0):
+def extract_tree(policy, root, H, zeta):
     nb_feat = root.shape[0] // 2
     a = policy[tuple(root.tolist() + [H])][zeta]
     if isinstance(a, np.int64):

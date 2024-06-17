@@ -1,8 +1,7 @@
 import numpy as np
-from typing import Union
 
 class State:
-    def __init__(self, label: np.ndarray, nz: np.ndarray, is_terminal: bool = False):
+    def __init__(self, label, nz, is_terminal=False):
         self.obs = label
         self.actions = []
         self.qs = []
@@ -14,20 +13,20 @@ class State:
         self.actions.append(action)
 
 class Action:
-    def __init__(self, action: Union[np.ndarray, np.int64]):
+    def __init__(self, action):
         self.action = action
         self.rewards = []
         self.probas = []
         self.next_states = []
 
-    def transition(self, reward: float, proba: float, next_s: State):
+    def transition(self, reward, proba, next_s):
         self.rewards.append(reward)
         self.probas.append(proba)
         self.next_states.append(next_s)
 
 
 
-def backward_induction_multiple_zetas(mdp: list[list[State]], zetas: np.ndarray):
+def backward_induction_multiple_zetas(mdp, zetas):
     policy = dict()
     max_depth = len(mdp)
     for H, d in enumerate(reversed(mdp)):
