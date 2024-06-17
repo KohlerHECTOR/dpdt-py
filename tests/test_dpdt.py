@@ -96,5 +96,9 @@ def test_real_data_one_tree():
 
 def test_pareto_front():
     S, Y = get_occupancy_data()
-    clf = DPDTree(3, cart_nodes_list=[16,8])
+    clf = DPDTree(3, max_nb_trees=4)
+    clf.fit(S, Y)
     S, Y = get_occupancy_data(test=True)
+    scores, avg_nb_tests = np.zeros_like(clf.zetas), np.zeros_like(clf.zetas)
+    for z in range(0, len(clf.zetas), 50):
+        scores[z], avg_nb_tests[z] = clf.average_traj_length_in_mdp(S, Y,zeta=z)
