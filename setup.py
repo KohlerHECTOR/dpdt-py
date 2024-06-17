@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-ver_file = os.path.join("adastop", "_version.py")
+ver_file = os.path.join("dpdt", "_version.py")
 with open(ver_file) as f:
     exec(f.read())
 
