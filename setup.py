@@ -12,6 +12,7 @@ setup(
     version=__version__,
     author="Hector Kohler",
     author_email="hector.kohler@inria.fr",
+    python_requires=">=3.8",
     packages=find_packages(),
     # package_data={'': extra_files},
     include_package_data=True,

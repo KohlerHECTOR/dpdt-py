@@ -1,9 +1,11 @@
 import numpy as np
-from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from sklearn.utils.multiclass import unique_labels
+from sklearn.base import BaseEstimator, ClassifierMixin, _fit_context
+from sklearn.utils.multiclass import check_classification_targets
+from sklearn.utils.validation import check_is_fitted
+from sklearn.utils._param_validation import Interval
 from sklearn.tree import DecisionTreeClassifier
 from .mdp_utils import backward_induction_multiple_zetas, Action, State
+from numbers import Integral, Real
 
 
 class DPDTree(ClassifierMixin, BaseEstimator):
@@ -21,15 +23,34 @@ class DPDTree(ClassifierMixin, BaseEstimator):
 
     Attributes
     ----------
+    X_ : ndarray, shape (n_samples, n_features)
+        The input passed during :meth:`fit`.
+
+    y_ : ndarray, shape (n_samples,)
+        The labels passed during :meth:`fit`.
+
+    classes_ : ndarray, shape (n_classes,)
+        The classes seen at :meth:`fit`.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
     mdp : list of list of State
         The Markov Decision Process represented as a list of lists of states,
         where each inner list contains the states at a specific depth.
+
     zetas : array-like
         Array of zeta values to be used in the computation.
+
     trees : dict
         A dictionary representing the tree policies. The keys are tuples representing
         the state observation and depth, and the values are the optimal tree
         for each zeta value.
+
     init_o : array-like
         The initial observation of the MDP.
 
@@ -50,16 +71,17 @@ class DPDTree(ClassifierMixin, BaseEstimator):
     >>> clf.fit(X,y)
     >>> print(clf.score(X, y))
     """
+    _parameter_constraints = {
+        "max_depth": [Interval(Integral, 2, None, closed="left")],
+        "max_nb_trees": [Interval(Integral, 1, None, closed="left")],
+        "cart_nodes_list": ["array-like"]
+    }
 
-    def __init__(self, max_depth, max_nb_trees=1000, cart_nodes_list=[3]):
+    def __init__(self, max_depth=3, max_nb_trees=1000, cart_nodes_list=(3,)):
         self.max_nb_trees = max_nb_trees
         self.max_depth = max_depth
         self.cart_nodes_list = cart_nodes_list
 
-        if max_nb_trees < 2:
-            self.zetas = np.zeros(1)
-        else:
-            self.zetas = np.linspace(-1, 0, max_nb_trees)
 
     def build_mdp(self):
         """
@@ -107,7 +129,8 @@ class DPDTree(ClassifierMixin, BaseEstimator):
 
         References
         ----------
-        [1] H. Kohler et. al., "Interpretable Decision Tree Search as
+
+        .. [1] H. Kohler et. al., "Interpretable Decision Tree Search as
         a Markov Decision Process" arXiv https://arxiv.org/abs/2309.12701.
         """
         max_depth = self.max_depth + 1
@@ -187,7 +210,8 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             else:
                 break
         return deci_nodes
-
+    
+    @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y):
         """
         Fit the DPDTree classifier.
@@ -205,18 +229,27 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             Fitted estimator.
         """
 
-        # Check that X and y have correct shape
-        X, y = check_X_y(X, y)
-        # Store the classes seen during fit
-        self.classes_ = unique_labels(y)
+        X, y = self._validate_data(X, y)
+        # We need to make sure that we have a classification task
+        check_classification_targets(y)
+
+        # classifier should always store the classes seen during `fit`
+        self.classes_ = np.unique(y)
+
+        # Store the training data to predict later
         self.X_ = X
         self.y_ = y
 
+        if self.max_nb_trees < 2:
+            self.zetas_ = np.zeros(1)
+        else:
+            self.zetas_ = np.linspace(-1, 0, self.max_nb_trees)
+
         print("Building MDP")
-        self.mdp = self.build_mdp()
-        self.init_o = self.mdp[0][0].obs
+        self.mdp_ = self.build_mdp()
+        self.init_o_ = self.mdp_[0][0].obs
         print("Backward")
-        self.trees = backward_induction_multiple_zetas(self.mdp, self.zetas)
+        self.trees_ = backward_induction_multiple_zetas(self.mdp_, self.zetas_)
         # Return the classifier
         return self
 
@@ -234,6 +267,13 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         y_pred : array of shape (n_samples,)
             The predicted classes.
         """
+        # Check if fit had been called
+        check_is_fitted(self)
+
+        # Input validation
+        # We need to set reset=False because we don't want to overwrite `n_features_in_`
+        # `feature_names_in_` but only check that the shape is consistent.
+        X = self._validate_data(X, reset=False)
         return self.predict_zeta_(X, -1)
 
     def predict_zeta_(self, X, zeta_index):
@@ -252,17 +292,12 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         y_pred : array of shape (n_samples,)
             The predicted classes.
         """
-        # Check if fit has been called
-        check_is_fitted(self)
-
-        # Input validation
-        X = check_array(X)
         # X = np.array(X, dtype=np.float64)
-        init_a = self.trees[tuple(self.init_o.tolist() + [0])][zeta_index]
-        y_pred = [0 for _ in X]
+        init_a = self.trees_[tuple(self.init_o_.tolist() + [0])][zeta_index]
+        y_pred = np.zeros(len(X), dtype=self.y_.dtype)
         for i, x in enumerate(X):
             a = init_a
-            o = self.init_o.copy()
+            o = self.init_o_.copy()
             H = 0
             while isinstance(a, list):  # a is int implies leaf node
                 feature, threshold = a
@@ -271,11 +306,11 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                     o[x.shape[0] + feature] = threshold
                 else:
                     o[feature] = threshold
-                a = self.trees[tuple(o.tolist() + [H])][zeta_index]
+                a = self.trees_[tuple(o.tolist() + [H])][zeta_index]
             y_pred[i] = a
         return y_pred
 
-    def average_traj_length_in_mdp(self, X, y, zeta):
+    def average_traj_length_in_mdp_(self, X, y, zeta_index):
         """
         Calculate the average trajectory length in the MDP.
 
@@ -285,7 +320,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             The input samples.
         y : array-like of shape (n_samples,)
             The target values.
-        zeta : int
+        zeta_index : int
             The zeta value to use for calculation.
 
         Returns
@@ -296,11 +331,11 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             The average trajectory length.
         """
         nb_features = X.shape[1]
-        init_a = self.trees[tuple(self.init_o.tolist() + [0])][zeta]
+        init_a = self.trees_[tuple(self.init_o_.tolist() + [0])][zeta_index]
         lengths = np.zeros(X.shape[0])
         for i, s in enumerate(X):
             a = init_a
-            o = self.init_o.copy()
+            o = self.init_o_.copy()
             H = 0
             while isinstance(a, list):  # a is int implies leaf node
                 feature, threshold = a
@@ -309,16 +344,24 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                     o[nb_features + feature] = threshold
                 else:
                     o[feature] = threshold
-                a = self.trees[tuple(o.tolist() + [H])][zeta]
+                a = self.trees_[tuple(o.tolist() + [H])][zeta_index]
 
             lengths[i] = H
         return (
             sum(
                 [
-                    self.predict_zeta_(X[i].reshape(1, -1), zeta)[0] == y[i]
+                    self.predict_zeta_(X[i].reshape(1, -1), zeta_index)[0] == y[i]
                     for i in range(len(X))
                 ]
             )
             / len(X),
             lengths.mean(),
         )
+    
+    def get_pareto_front(self, X, y):
+        scores = np.zeros(X.shape[0])
+        decision_path_length = np.zeros(X.shape[0])
+        for z in range(len(self.zetas_)):
+            scores[z], decision_path_length[z] = self.average_traj_length_in_mdp_(X,y,z)
+        return scores, decision_path_length
+
