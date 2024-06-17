@@ -1,7 +1,7 @@
 ## Quickstart
 
 ```bash
-pip install -e .
+pip install git+https://github.com/KohlerHECTOR/dpdt-py
 ```
 
 ```python
