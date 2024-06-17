@@ -21,5 +21,5 @@ setup(
     description="Dynamic Programming Decision Tree",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    install_requires=["scikit-learn"],
+    install_requires=["scikit-learn", "pytest-cov"],
 )
