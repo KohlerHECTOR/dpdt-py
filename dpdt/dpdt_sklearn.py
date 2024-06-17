@@ -8,7 +8,7 @@ from .mdp_utils import backward_induction_multiple_zetas, Action, State
 
 class DPDTree(ClassifierMixin, BaseEstimator):
 
-    def __init__(self, max_depth: int, max_nb_trees: int = 1, cart_nodes_list: list[int] = [3]):
+    def __init__(self, max_depth: int, max_nb_trees: int = 1000, cart_nodes_list: list[int] = [3]):
         self.max_nb_trees = max_nb_trees
         self.max_depth = max_depth
         self.cart_nodes_list = cart_nodes_list
@@ -108,14 +108,16 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         return self
 
     def predict(self, X):
-
+        return self.predict_zeta_(X, -1)
+    
+    def predict_zeta_(self, X, zeta_index:int):
         # Check if fit has been called
         check_is_fitted(self)
 
         # Input validation
         X = check_array(X)
         # X = np.array(X, dtype=np.float64)
-        init_a = self.trees[tuple(self.init_o.tolist() + [0])][-1]
+        init_a = self.trees[tuple(self.init_o.tolist() + [0])][zeta_index]
         y_pred = [0 for _ in X]
         for i, x in enumerate(X):
             a = init_a
@@ -128,16 +130,15 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                     o[x.shape[0] + feature] = threshold
                 else:
                     o[feature] = threshold
-                a = self.trees[tuple(o.tolist() + [H])][-1]
+                a = self.trees[tuple(o.tolist() + [H])][zeta_index]
             y_pred[i] = a
         return y_pred
     
-    def average_traj_length_in_mdp(self, X, y, tree: dict):
-        X = np.array(X, dtype=np.float64)
-        y = np.array(y, dtype=np.int64)
 
+    
+    def average_traj_length_in_mdp(self, X, y, zeta:int):
         nb_features = X.shape[1]
-        init_a = tree[tuple(self.init_o.tolist() + [0])]
+        init_a = self.trees[tuple(self.init_o.tolist() + [0])][zeta]
         lengths = np.zeros(X.shape[0])
         for i, s in enumerate(X):
             a = init_a
@@ -150,7 +151,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                     o[nb_features + feature] = threshold
                 else:
                     o[feature] = threshold
-                a = tree[tuple(o.tolist() + [H])]
+                a = self.trees[tuple(o.tolist() + [H])][zeta]
 
             lengths[i] = H
-        return self.score(X,y), lengths.mean()
+        return sum([self.predict_zeta_(X[i].reshape(1,-1), zeta)[0]==y[i] for i in range(len(X))])/len(X), lengths.mean()
