@@ -1,8 +1,20 @@
 import numpy as np
-from typing import Union
+
 
 class State:
-    def __init__(self, label: np.ndarray, nz: np.ndarray, is_terminal: bool = False):
+    """
+    Represents a state in the Markov Decision Process (MDP).
+
+    Parameters
+    ----------
+    label : array-like
+        The observation label for the state.
+    nz : array-like of bool
+        Boolean array indicating which samples are present in the state.
+    is_terminal : bool, default=False
+        Indicates if the state is a terminal state.
+    """
+    def __init__(self, label, nz, is_terminal=False):
         self.obs = label
         self.actions = []
         self.qs = []
@@ -11,23 +23,72 @@ class State:
         # self.v = 0
 
     def add_action(self, action):
+        """
+        Add an action to the state.
+
+        Parameters
+        ----------
+        action : Action
+            The action to be added to the state.
+        """
         self.actions.append(action)
 
+
 class Action:
-    def __init__(self, action: Union[np.ndarray, np.int64]):
+    """
+    Represents an action in the Markov Decision Process (MDP).
+
+    Parameters
+    ----------
+    action : object
+        The action representation (e.g., a split decision).
+    """
+    def __init__(self, action):
         self.action = action
         self.rewards = []
         self.probas = []
         self.next_states = []
 
-    def transition(self, reward: float, proba: float, next_s: State):
+    def transition(self, reward, proba, next_s):
+        """
+        Add a transition for the action.
+
+        Parameters
+        ----------
+        reward : float
+            The reward associated with the transition.
+        proba : float
+            The probability of the transition.
+        next_s : State
+            The next state resulting from the transition.
+        """
         self.rewards.append(reward)
         self.probas.append(proba)
         self.next_states.append(next_s)
 
 
+def backward_induction_multiple_zetas(mdp, zetas):
+    """
+    Perform backward induction on the MDP for multiple zeta values.
 
-def backward_induction_multiple_zetas(mdp: list[list[State]], zetas: np.ndarray):
+    This function computes the optimal policy for each zeta value by performing
+    backward induction on the provided MDP.
+
+    Parameters
+    ----------
+    mdp : list of list of State
+        The Markov Decision Process represented as a list of lists of states,
+        where each inner list contains the states at a specific depth.
+    zetas : array-like
+        Array of zeta values to be used in the computation.
+
+    Returns
+    -------
+    policy : dict
+        A dictionary representing the policy. The keys are tuples representing
+        the state observation and depth, and the values are the optimal actions
+        for each zeta value.
+    """
     policy = dict()
     max_depth = len(mdp)
     for H, d in enumerate(reversed(mdp)):
