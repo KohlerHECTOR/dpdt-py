@@ -1,16 +1,10 @@
 import numpy as np
 from dpdt import DPDTree
-import json
+from sklearn.utils.estimator_checks import check_estimator
 
 
-def get_occupancy_data(test=False):
-    # Opening JSON file
-    with open("classification_datasets/occupancy.json") as json_file:
-        data = json.load(json_file)
-    if test:
-        return np.array(data["Xtest"]), np.array(data["Ytest"])
-    else:
-        return np.array(data["Xtrain"]), np.array(data["Ytrain"])
+def test_check_estimator():
+    check_estimator(DPDTree(2))
 
 
 def test_dpdt_different_cart_size_mdeium():
@@ -83,7 +77,7 @@ def test_only_one_class():
 
 
 def test_real_data():
-    S, Y = get_occupancy_data()
+    S, Y = np.random.random((1000, 50)), np.random.randint(0, 10, 1000)
     clf = DPDTree(3, max_nb_trees=5, cart_nodes_list=[16, 8])
 
     clf.fit(S, Y)
@@ -91,7 +85,7 @@ def test_real_data():
 
 
 def test_real_data_default():
-    S, Y = get_occupancy_data()
+    S, Y = np.random.random((1000, 50)), np.random.randint(0, 10, 1000)
     clf = DPDTree(3)
 
     clf.fit(S, Y)
@@ -99,7 +93,7 @@ def test_real_data_default():
 
 
 def test_real_data_one_tree():
-    S, Y = get_occupancy_data()
+    S, Y = np.random.random((1000, 50)), np.random.randint(0, 10, 1000)
     clf = DPDTree(3, max_nb_trees=1, cart_nodes_list=[16, 8])
 
     clf.fit(S, Y)
@@ -107,10 +101,8 @@ def test_real_data_one_tree():
 
 
 def test_pareto_front():
-    S, Y = get_occupancy_data()
+    S, Y = np.random.random((1000, 50)), np.random.randint(0, 10, 1000)
     clf = DPDTree(3, max_nb_trees=4)
     clf.fit(S, Y)
-    S, Y = get_occupancy_data(test=True)
-    scores, avg_nb_tests = np.zeros_like(clf.zetas), np.zeros_like(clf.zetas)
-    for z in range(len(clf.zetas)):
-        scores[z], avg_nb_tests[z] = clf.average_traj_length_in_mdp(S, Y, zeta=z)
+    S, Y = np.random.random((1000, 50)), np.random.randint(0, 10, 1000)
+    clf.get_pareto_front(S, Y)

@@ -4,6 +4,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 from time import time
+import urllib.request
 
 
 def get_occupancy_data(test=False):
@@ -21,6 +22,9 @@ def count_avg_test_cart(clf: DecisionTreeClassifier, X):
     return node_indicator.sum(axis=1).mean() - 1
 
 
+print("downloading occupancy data ...")
+urllib.request.urlretrieve("https://raw.githubusercontent.com/KohlerHECTOR/dpdt-py/main/classification_datasets/occupancy.json", "classification_datasets/occupancy.json")
+
 # Train
 X, y = get_occupancy_data()
 # DPDT
@@ -36,11 +40,7 @@ print(clf.score(X, y))
 X_test, y_test = get_occupancy_data(test=True)
 
 t = time()
-scores, avg_nb_tests = np.zeros_like(clf_dpdt.zetas), np.zeros_like(clf_dpdt.zetas)
-for z in range(len(clf_dpdt.zetas)):
-    scores[z], avg_nb_tests[z] = clf_dpdt.average_traj_length_in_mdp(
-        X_test, y_test, zeta=z
-    )
+scores, avg_nb_tests = scores, avg_nb_tests = clf_dpdt.get_pareto_front(X_test, y_test)
 time_pareto_front = time() - t
 
 plt.scatter(
