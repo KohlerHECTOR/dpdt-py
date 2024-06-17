@@ -28,17 +28,10 @@ jobs:
       - name: Sphinx build
         run: |
           sphinx-build docs _build
-      - uses: actions/checkout@v4
-        with:
-          # This is necessary so that we have the tags.
-          fetch-depth: 0
-          ref: gh-pages
-          path: gh_pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
-          publish_branch: gh-pages
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _build/
-          force_orphan: true
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: ./docs/_build/html
+            # If you want to deploy to a custom domain, uncomment the next line and set the domain
+            # cname: your.custom.domain
