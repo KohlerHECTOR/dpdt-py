@@ -1,9 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-ver_file = os.path.join("dpdt", "_version.py")
-with open(ver_file) as f:
-    exec(f.read())
+__version__="0.1.1"
 
 packages = find_packages(exclude=["tests", "examples",])
 
