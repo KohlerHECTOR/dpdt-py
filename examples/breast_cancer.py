@@ -10,7 +10,7 @@ clf = DPDTree(max_depth=2)
 clf.fit(X, y)
 print(clf.score(X, y))
 
-#CART
+# CART
 clf = DecisionTreeClassifier(max_depth=2)
-clf.fit(X,y)
+clf.fit(X, y)
 print(clf.score(X, y))

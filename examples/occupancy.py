@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from time import time
 
+
 def get_occupancy_data(test=False):
     # Opening JSON file
     with open("classification_datasets/occupancy.json") as json_file:
@@ -26,9 +27,9 @@ X, y = get_occupancy_data()
 clf_dpdt = DPDTree(max_depth=3, max_nb_trees=20)
 clf_dpdt.fit(X, y)
 print(clf_dpdt.score(X, y))
-#CART
+# CART
 clf = DecisionTreeClassifier(max_depth=3)
-clf.fit(X,y)
+clf.fit(X, y)
 print(clf.score(X, y))
 
 # Test
@@ -37,10 +38,17 @@ X_test, y_test = get_occupancy_data(test=True)
 t = time()
 scores, avg_nb_tests = np.zeros_like(clf_dpdt.zetas), np.zeros_like(clf_dpdt.zetas)
 for z in range(len(clf_dpdt.zetas)):
-    scores[z], avg_nb_tests[z] = clf_dpdt.average_traj_length_in_mdp(X_test,y_test,zeta=z)
-time_pareto_front = time()-t
+    scores[z], avg_nb_tests[z] = clf_dpdt.average_traj_length_in_mdp(
+        X_test, y_test, zeta=z
+    )
+time_pareto_front = time() - t
 
-plt.scatter(scores, avg_nb_tests, label="DPDTrees, time={}".format(round(time_pareto_front,3)), marker="*")
+plt.scatter(
+    scores,
+    avg_nb_tests,
+    label="DPDTrees, time={}".format(round(time_pareto_front, 3)),
+    marker="*",
+)
 
 
 t = time()
@@ -53,10 +61,17 @@ for c, ccp_alpha in enumerate(ccp_alphas):
         max_depth=3,
     )
     clf.fit(X_test, y_test)
-    scores[c], avg_nb_tests[c] = clf.score(X_test, y_test), count_avg_test_cart(clf,X_test)
-time_pareto_front = time()-t
-plt.scatter(scores, avg_nb_tests, label="CARTccp, time={}".format(round(time_pareto_front,3)), marker="P", alpha=0.5)
-
+    scores[c], avg_nb_tests[c] = clf.score(X_test, y_test), count_avg_test_cart(
+        clf, X_test
+    )
+time_pareto_front = time() - t
+plt.scatter(
+    scores,
+    avg_nb_tests,
+    label="CARTccp, time={}".format(round(time_pareto_front, 3)),
+    marker="P",
+    alpha=0.5,
+)
 
 
 plt.xlabel("Test Accuracy")
@@ -64,4 +79,3 @@ plt.ylabel("Average decision path length")
 plt.title("Pareto Front - Occupancy")
 plt.legend()
 plt.savefig("occupancy.png")
-
