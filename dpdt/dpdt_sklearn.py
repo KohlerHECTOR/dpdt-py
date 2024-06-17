@@ -63,7 +63,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
 
     def build_mdp(self):
         """
-        Build the Markov Decision Process (MDP) for the tree.
+        Build the Markov Decision Process (MDP) for the trees.
 
         This method constructs an MDP using a breadth-first search approach. Each node in the tree represents a state in the MDP,
         and actions are determined based on potential splits from a decision tree classifier.
