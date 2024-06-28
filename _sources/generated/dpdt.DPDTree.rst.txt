@@ -1,0 +1,12 @@
+﻿:mod:`dpdt`.DPDTree
+==========================
+
+.. currentmodule:: dpdt
+
+.. autoclass:: DPDTree
+
+.. include:: dpdt.DPDTree.examples
+
+.. raw:: html
+
+    <div class="clearer"></div>

@@ -1,0 +1,12 @@
+﻿:mod:`dpdt`.DPDTree.build_mdp
+==========================================
+
+.. currentmodule:: dpdt
+
+.. autofunction:: DPDTree.build_mdp
+
+.. include:: dpdt.DPDTree.build_mdp.examples
+
+.. raw:: html
+
+    <div class="clearer"></div>
