@@ -4,7 +4,7 @@ pip install git+https://github.com/KohlerHECTOR/dpdt-py
 ```
 
 
-## Usage
+## Quickstart
 DPDTree uses the ```scikit-learn``` API. You can find advanced exapmles [here](https://github.com/KohlerHECTOR/dpdt-py/blob/main/examples/).
 
 ```python

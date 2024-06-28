@@ -2,7 +2,7 @@
 API
 ###
 
-Adastop can be used via the python API. Mainly using the MultipleAgentsComparator class.
+DPDT can be used via the python API. Mainly using the DPDTree estimator.
 
 
 .. currentmodule:: dpdt
@@ -23,8 +23,7 @@ Main functions
   :toctree: generated/
   :template: function.rst
 
-    dpdt.dpdt_sklearn.build_mdp
-    dpdt.dpdt_sklearn.predict_zeta_
-    dpdt.dpdt_sklearn.average_traj_length_in_mdp_
+    dpdt.DPDTree.build_mdp
+    dpdt.DPDTree.get_pareto_front
 
     

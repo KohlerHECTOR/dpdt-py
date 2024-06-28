@@ -130,8 +130,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         References
         ----------
 
-        .. [1] H. Kohler et. al., "Interpretable Decision Tree Search as
-        a Markov Decision Process" arXiv https://arxiv.org/abs/2309.12701.
+        .. [1] H. Kohler et. al., "Interpretable Decision Tree Search as a Markov Decision Process" arXiv https://arxiv.org/abs/2309.12701.
         """
         max_depth = self.max_depth + 1
         root = State(
