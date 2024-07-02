@@ -1,9 +1,14 @@
 from setuptools import setup, find_packages
 import os
 
-__version__="0.1.1"
+__version__ = "0.1.2"
 
-packages = find_packages(exclude=["tests", "examples",])
+packages = find_packages(
+    exclude=[
+        "tests",
+        "examples",
+    ]
+)
 
 
 with open("README.md", "r") as fh:
@@ -11,7 +16,7 @@ with open("README.md", "r") as fh:
 
 
 setup(
-    name='dpdt',
+    name="dpdt",
     version=__version__,
     license="MIT",
     packages=packages,
@@ -21,7 +26,5 @@ setup(
     long_description_content_type="text/markdown",
     author="Hector Kohler",
     author_email="hector.kohler@inria.fr",
-    install_requires=[
-        "scikit-learn"
-    ],
+    install_requires=["scikit-learn"],
 )

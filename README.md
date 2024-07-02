@@ -9,7 +9,7 @@ pip install git+https://github.com/KohlerHECTOR/dpdt-py
 
 
 ## Usage
-DPDTree uses the ```scikit-learn``` API. You can find advanced exapmles [here](https://github.com/KohlerHECTOR/dpdt-py/blob/main/examples/).
+DPDTree uses the ```scikit-learn``` API. You can find advanced examples [here](https://github.com/KohlerHECTOR/dpdt-py/blob/main/examples/).
 
 ```python
 from dpdt import DPDTree

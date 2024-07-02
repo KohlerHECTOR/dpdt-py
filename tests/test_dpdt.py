@@ -47,7 +47,6 @@ def test_dpdt_different_data_medium():
 def test_dpdt_different_data_big():
     S, Y = np.random.random((10000, 10)), np.random.randint(0, 6, 10000)
     clf = DPDTree(3, max_nb_trees=5, cart_nodes_list=[16, 8])
-
     clf.fit(S, Y)
     clf.score(S, Y)
 
@@ -55,7 +54,6 @@ def test_dpdt_different_data_big():
 def test_dpdt_different_data_high_dim():
     S, Y = np.random.random((10, 100)), np.random.randint(0, 6, 10)
     clf = DPDTree(3, max_nb_trees=5, cart_nodes_list=[16, 8])
-
     clf.fit(S, Y)
     clf.score(S, Y)
 
@@ -63,7 +61,6 @@ def test_dpdt_different_data_high_dim():
 def test_ultimate():
     S, Y = np.random.random((1000, 50)), np.random.randint(0, 10, 1000)
     clf = DPDTree(4, max_nb_trees=10, cart_nodes_list=[16, 8, 4])
-
     clf.fit(S, Y)
     clf.score(S, Y)
 
@@ -71,7 +68,6 @@ def test_ultimate():
 def test_only_one_class():
     S, Y = np.random.random((1000, 50)), np.random.randint(0, 1, 1000)
     clf = DPDTree(3, max_nb_trees=5, cart_nodes_list=[16, 8])
-
     clf.fit(S, Y)
     clf.score(S, Y)
 
@@ -79,7 +75,6 @@ def test_only_one_class():
 def test_real_data():
     S, Y = np.random.random((1000, 50)), np.random.randint(0, 10, 1000)
     clf = DPDTree(3, max_nb_trees=5, cart_nodes_list=[16, 8])
-
     clf.fit(S, Y)
     clf.score(S, Y)
 
@@ -87,7 +82,6 @@ def test_real_data():
 def test_real_data_default():
     S, Y = np.random.random((1000, 50)), np.random.randint(0, 10, 1000)
     clf = DPDTree(3)
-
     clf.fit(S, Y)
     clf.score(S, Y)
 
@@ -95,7 +89,6 @@ def test_real_data_default():
 def test_real_data_one_tree():
     S, Y = np.random.random((1000, 50)), np.random.randint(0, 10, 1000)
     clf = DPDTree(3, max_nb_trees=1, cart_nodes_list=[16, 8])
-
     clf.fit(S, Y)
     clf.score(S, Y)
 

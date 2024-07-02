@@ -97,7 +97,7 @@ def backward_induction_multiple_zetas(mdp, zetas):
         for node in d:
             qs = []
             for a in node.actions:
-                if not isinstance(a.action, list):
+                if not isinstance(a.action, tuple):
                     q_s_a = np.ones(zetas.shape[0]) * a.rewards[0]
                 else:
                     q_s_a = np.zeros(zetas.shape[0])
