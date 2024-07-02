@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 packages = find_packages(
     exclude=[
