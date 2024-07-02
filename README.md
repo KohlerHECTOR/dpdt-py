@@ -20,12 +20,11 @@ from sklearn.tree import DecisionTreeClassifier
 X, y = datasets.load_breast_cancer(return_X_y=True)
 
 # DPDT
-clf = DPDTree(max_depth=3)
-clf.fit(X, y)
-print(clf.score(X, y))
+dpdt = DPDTree(max_depth=3, random_state=42)
+dpdt.fit(X, y)
 
 #CART
-clf = DecisionTreeClassifier(max_depth=3)
-clf.fit(X,y)
-print(clf.score(X, y))
+cart = DecisionTreeClassifier(max_depth=3, random_state=42)
+cart.fit(X, y)
+assert dpdt.score(X, y) >= cart.score(X, y)
 ```

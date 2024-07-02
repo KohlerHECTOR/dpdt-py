@@ -9,7 +9,7 @@ import urllib.request
 
 def get_occupancy_data(test=False):
     # Opening JSON file
-    with open("classification_datasets/occupancy.json") as json_file:
+    with open("occupancy.json") as json_file:
         data = json.load(json_file)
     if test:
         return np.array(data["Xtest"]), np.array(data["Ytest"])
@@ -25,7 +25,7 @@ def count_avg_test_cart(clf: DecisionTreeClassifier, X):
 print("downloading occupancy data ...")
 urllib.request.urlretrieve(
     "https://raw.githubusercontent.com/KohlerHECTOR/dpdt-py/main/classification_datasets/occupancy.json",
-    "classification_datasets/occupancy.json",
+    "occupancy.json",
 )
 
 # Train

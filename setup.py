@@ -26,5 +26,5 @@ setup(
     long_description_content_type="text/markdown",
     author="Hector Kohler",
     author_email="hector.kohler@inria.fr",
-    install_requires=["scikit-learn"],
+    install_requires=["scikit-learn>=1.3.0"],
 )
