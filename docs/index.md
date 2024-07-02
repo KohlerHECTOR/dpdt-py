@@ -25,3 +25,17 @@ Information on python classes behind DPDT.
 
 api
 ```
+
+### Cite
+
+```bibtex
+@misc{kohler2024interpretabledecisiontreesearch,
+      title={Interpretable Decision Tree Search as a Markov Decision Process}, 
+      author={Hector Kohler and Riad Akrour and Philippe Preux},
+      year={2024},
+      eprint={2309.12701},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2309.12701}, 
+}
+```

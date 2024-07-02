@@ -28,3 +28,17 @@ cart = DecisionTreeClassifier(max_depth=3, random_state=42)
 cart.fit(X, y)
 assert dpdt.score(X, y) >= cart.score(X, y)
 ```
+
+### Cite
+
+```bibtex
+@misc{kohler2024interpretabledecisiontreesearch,
+      title={Interpretable Decision Tree Search as a Markov Decision Process}, 
+      author={Hector Kohler and Riad Akrour and Philippe Preux},
+      year={2024},
+      eprint={2309.12701},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2309.12701}, 
+}
+```
