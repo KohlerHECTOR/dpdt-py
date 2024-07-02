@@ -74,7 +74,9 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         "random_state": [Interval(Integral, 0, None, closed="left")],
     }
 
-    def __init__(self, max_depth=3, max_nb_trees=1000, cart_nodes_list=(3,), random_state=42):
+    def __init__(
+        self, max_depth=3, max_nb_trees=1000, cart_nodes_list=(3,), random_state=42
+    ):
         # TODO potentially direcltly pass an instantiated CART.
         self.max_depth = max_depth
         self.max_nb_trees = max_nb_trees
@@ -157,11 +159,14 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                     # Note that that 2 leaf nodes means that the split is greedy.
                     if d <= len(self.cart_nodes_list) - 1:
                         clf = DecisionTreeClassifier(
-                            max_leaf_nodes=max(2, self.cart_nodes_list[d]), random_state=self.random_state
+                            max_leaf_nodes=max(2, self.cart_nodes_list[d]),
+                            random_state=self.random_state,
                         )
                     # If depth budget reaches limit, get the max entropy split.
                     else:
-                        clf = DecisionTreeClassifier(max_leaf_nodes=2, random_state=self.random_state)
+                        clf = DecisionTreeClassifier(
+                            max_leaf_nodes=2, random_state=self.random_state
+                        )
 
                     clf.fit(self.X_[node.nz], self.y_[node.nz])
 
@@ -219,16 +224,20 @@ class DPDTree(ClassifierMixin, BaseEstimator):
 
                     # Perform transitions and append states
                     for i in range(len(valid_features)):
-                        if lefts[:,i].astype(int).sum() > 0: 
+                        if lefts[:, i].astype(int).sum() > 0:
                             actions[i].transition(0, p_left[i], next_states_left[i])
                             tmp.append(next_states_left[i])
 
                     for i in range(len(valid_features)):
-                        if rights[:,i].astype(int).sum() > 0: 
+                        if rights[:, i].astype(int).sum() > 0:
                             actions[i].transition(0, p_right[i], next_states_right[i])
                             tmp.append(next_states_right[i])
 
-                    [node.add_action(action) for action in actions if action.rewards != []]
+                    [
+                        node.add_action(action)
+                        for action in actions
+                        if action.rewards != []
+                    ]
 
             if tmp != []:
                 deci_nodes.append(tmp)
