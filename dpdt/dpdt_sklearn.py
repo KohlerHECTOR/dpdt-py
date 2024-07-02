@@ -59,16 +59,11 @@ class DPDTree(ClassifierMixin, BaseEstimator):
     --------
     >>> from dpdt import DPDTree
     >>> from sklearn import datasets
-    >>> from sklearn.tree import DecisionTreeClassifier
     >>>
     >>> X, y = datasets.load_breast_cancer(return_X_y=True)
     >>>
-    >>> clf = DPDTree(max_depth=3)
+    >>> clf = DPDTree(max_depth=3, random_state=42)
     >>> clf.fit(X, y)
-    >>> print(clf.score(X, y))
-    >>>
-    >>> clf = DecisionTreeClassifier(max_depth=3)
-    >>> clf.fit(X,y)
     >>> print(clf.score(X, y))
     """
 
@@ -76,13 +71,15 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         "max_depth": [Interval(Integral, 2, None, closed="left")],
         "max_nb_trees": [Interval(Integral, 1, None, closed="left")],
         "cart_nodes_list": ["array-like"],
+        "random_state": [Interval(Integral, 0, None, closed="left")],
     }
 
-    def __init__(self, max_depth=3, max_nb_trees=1000, cart_nodes_list=(3,)):
+    def __init__(self, max_depth=3, max_nb_trees=1000, cart_nodes_list=(3,), random_state=42):
         # TODO potentially direcltly pass an instantiated CART.
-        self.max_nb_trees = max_nb_trees
         self.max_depth = max_depth
+        self.max_nb_trees = max_nb_trees
         self.cart_nodes_list = cart_nodes_list
+        self.random_state = random_state
 
     def build_mdp(self):
         """
@@ -157,13 +154,14 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                 # If there is still depth budget and the current split has more than 1 class:
                 if (d + 1) < max_depth and classes.shape[0] >= 2:
                     # Get the splits from CART
+                    # Note that that 2 leaf nodes means that the split is greedy.
                     if d <= len(self.cart_nodes_list) - 1:
                         clf = DecisionTreeClassifier(
-                            max_leaf_nodes=self.cart_nodes_list[d]
+                            max_leaf_nodes=max(2, self.cart_nodes_list[d]), random_state=self.random_state
                         )
                     # If depth budget reaches limit, get the max entropy split.
                     else:
-                        clf = DecisionTreeClassifier(max_leaf_nodes=2)
+                        clf = DecisionTreeClassifier(max_leaf_nodes=2, random_state=self.random_state)
 
                     clf.fit(self.X_[node.nz], self.y_[node.nz])
 
@@ -221,14 +219,16 @@ class DPDTree(ClassifierMixin, BaseEstimator):
 
                     # Perform transitions and append states
                     for i in range(len(valid_features)):
-                        actions[i].transition(0, p_left[i], next_states_left[i])
-                        tmp.append(next_states_left[i])
+                        if lefts[:,i].astype(int).sum() > 0: 
+                            actions[i].transition(0, p_left[i], next_states_left[i])
+                            tmp.append(next_states_left[i])
 
                     for i in range(len(valid_features)):
-                        actions[i].transition(0, p_right[i], next_states_right[i])
-                        tmp.append(next_states_right[i])
+                        if rights[:,i].astype(int).sum() > 0: 
+                            actions[i].transition(0, p_right[i], next_states_right[i])
+                            tmp.append(next_states_right[i])
 
-                    [node.add_action(action) for action in actions]
+                    [node.add_action(action) for action in actions if action.rewards != []]
 
             if tmp != []:
                 deci_nodes.append(tmp)
@@ -270,11 +270,10 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             self.zetas_ = np.zeros(1)
         else:
             self.zetas_ = np.linspace(-1, 0, self.max_nb_trees)
+            assert len(self.zetas_) == self.max_nb_trees
 
-        print("Building MDP")
         self.mdp_ = self.build_mdp()
         self.init_o_ = self.mdp_[0][0].obs
-        print("Backward")
         self.trees_ = backward_induction_multiple_zetas(self.mdp_, self.zetas_)
         # Return the classifier
         return self
@@ -402,8 +401,8 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         decision_path_length : array-like of shape (n_samples)
             The average number of decision nodes traversal in each tree.
         """
-        scores = np.zeros(X.shape[0])
-        decision_path_length = np.zeros(X.shape[0])
+        scores = np.zeros(len(self.zetas_))
+        decision_path_length = np.zeros(len(self.zetas_))
         for z in range(len(self.zetas_)):
             scores[z], decision_path_length[z] = self.average_traj_length_in_mdp_(
                 X, y, z

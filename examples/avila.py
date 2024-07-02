@@ -10,7 +10,7 @@ import urllib.request
 def get_avila_data(test=False):
 
     # Opening JSON file
-    with open("classification_datasets/avila.json") as json_file:
+    with open("avila.json") as json_file:
         data = json.load(json_file)
     if test:
         return np.array(data["Xtest"]), np.array(data["Ytest"])
@@ -26,7 +26,7 @@ def count_avg_test_cart(clf: DecisionTreeClassifier, X):
 print("downloading avila data ...")
 urllib.request.urlretrieve(
     "https://raw.githubusercontent.com/KohlerHECTOR/dpdt-py/main/classification_datasets/avila.json",
-    "classification_datasets/avila.json",
+    "avila.json",
 )
 
 # Train
