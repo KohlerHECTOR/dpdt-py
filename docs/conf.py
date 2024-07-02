@@ -6,10 +6,10 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'dpdt'
-copyright = '2024, Hector Kohler'
-author = 'Hector Kohler'
-release = '0.1.1'
+project = "dpdt"
+copyright = "2024, Hector Kohler"
+author = "Hector Kohler"
+release = "0.1.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -46,12 +46,12 @@ autodoc_inherit_docstrings = True
 source_suffix = [".rst", ".md"]
 
 
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme_options = {
     "header_links_before_dropdown": 4,
-        "logo": {
+    "logo": {
         "text": "DPDTree",
     },
     "icon_links": [
@@ -60,7 +60,6 @@ html_theme_options = {
             "url": "https://github.com/KohlerHECTOR/dpdt-py",
             "icon": "fa-brands fa-github",
         },
-        
     ],
     "use_edit_page_button": False,
     "show_toc_level": 1,
@@ -79,9 +78,7 @@ html_theme_options = {
 #     ],  # This ensures we test for custom sidebars
 # }
 
-html_sidebars = {
-    "**":["page-toc"]
-}
+html_sidebars = {"**": ["page-toc"]}
 
 html_context = {
     "github_user": "KohlerHECTOR",
@@ -95,4 +92,4 @@ html_context = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
-html_static_path = ['_static']
+html_static_path = ["_static"]

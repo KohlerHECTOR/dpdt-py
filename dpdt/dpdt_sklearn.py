@@ -10,7 +10,7 @@ from numbers import Integral, Real
 
 class DPDTree(ClassifierMixin, BaseEstimator):
     """
-    Dynamic Proorgramming Decision Tree (DPDTree) classifier.
+    Dynamic Programming Decision Tree (DPDTree) classifier.
 
     Parameters
     ----------
@@ -79,6 +79,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
     }
 
     def __init__(self, max_depth=3, max_nb_trees=1000, cart_nodes_list=(3,)):
+        # TODO potentially direcltly pass an instantiated CART.
         self.max_nb_trees = max_nb_trees
         self.max_depth = max_depth
         self.cart_nodes_list = cart_nodes_list
@@ -155,53 +156,79 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                 node.add_action(a)
                 # If there is still depth budget and the current split has more than 1 class:
                 if (d + 1) < max_depth and classes.shape[0] >= 2:
-                    feat_thresh = []
-                    lefts, rights = [], []
-                    probas_left, probas_right = [], []
+                    # Get the splits from CART
                     if d <= len(self.cart_nodes_list) - 1:
                         clf = DecisionTreeClassifier(
                             max_leaf_nodes=self.cart_nodes_list[d]
                         )
+                    # If depth budget reaches limit, get the max entropy split.
                     else:
                         clf = DecisionTreeClassifier(max_leaf_nodes=2)
 
                     clf.fit(self.X_[node.nz], self.y_[node.nz])
-                    for i in range(len(clf.tree_.feature)):
-                        if clf.tree_.feature[i] >= 0:
-                            # TODO: try to vectorize this ops.
-                            inf = (
-                                self.X_[:, clf.tree_.feature[i]]
-                                <= clf.tree_.threshold[i]
-                            ) * node.nz
-                            sup = np.logical_not(inf) * node.nz
-                            p_left = inf.sum() / node.nz.sum()
-                            p_right = 1 - p_left
-                            lefts.append(inf)
-                            rights.append(sup)
-                            feat_thresh.append(
-                                [clf.tree_.feature[i], clf.tree_.threshold[i]]
-                            )
-                            probas_left.append(p_left)
-                            probas_right.append(p_right)
 
-                    for i, split in enumerate(feat_thresh):
-                        a = Action(split)
-                        feature, threshold = split
-                        next_obs_left = obs.copy()
-                        next_obs_left[self.X_.shape[1] + feature] = threshold
-                        next_obs_right = obs.copy()
-                        next_obs_right[feature] = threshold
+                    # Extract the splits from the CART tree.
 
-                        if lefts[i].sum() > 0:
-                            next_state_left = State(next_obs_left, lefts[i])
-                            a.transition(0, probas_left[i], next_state_left)
-                            tmp.append(next_state_left)
-                        if rights[i].sum() > 0:
-                            next_state_right = State(next_obs_right, rights[i])
-                            a.transition(0, probas_right[i], next_state_right)
-                            tmp.append(next_state_right)
-                        if a.rewards != []:
-                            node.add_action(a)
+                    masks = clf.tree_.feature >= 0  # get tested features.
+
+                    # Apply mask to features and thresholds to get valid indices
+                    valid_features = clf.tree_.feature[masks]
+                    valid_thresholds = clf.tree_.threshold[masks]
+                    lefts = (
+                        self.X_[:, valid_features] <= valid_thresholds
+                    )  # is a 2D array with nb CART tree tests columns.
+                    rights = np.logical_not(
+                        lefts
+                    )  # as many rows as data in the whole training set.
+
+                    # Masking data passing threshold and precedent thresholds.
+                    lefts *= node.nz[:, np.newaxis]
+                    rights *= node.nz[:, np.newaxis]
+
+                    # Compute probabilities
+                    p_left = lefts.sum(axis=0) / node.nz.sum()  # summing column values.
+                    # In each column (tested features), non-zero values are data indices passing all tests so far in the MDP trajectory.
+                    p_right = 1 - p_left
+
+                    feat_thresh = list(
+                        zip(valid_features, valid_thresholds)
+                    )  # len of the list is nb tests in CART tree.
+
+                    # Precompute next observations for left and right splits
+                    next_obs_left = np.tile(obs, (len(feat_thresh), 1))
+                    next_obs_right = np.tile(obs, (len(feat_thresh), 1))
+                    indices = np.arange(len(feat_thresh))
+
+                    # Fast next obs computations. The next obs in the MDP traj get their bounds updated as the threshold values.
+                    next_obs_left[
+                        indices, self.X_.shape[1] + valid_features
+                    ] = valid_thresholds
+                    next_obs_right[indices, valid_features] = valid_thresholds
+
+                    # Create Action objects for each split
+                    actions = [Action(split) for split in feat_thresh]
+
+                    # Precompute next states for left and right
+                    # There should be a pair of next_states per tested features.
+                    next_states_left = [
+                        State(next_obs_left[i], lefts[:, i])
+                        for i in range(len(valid_features))
+                    ]
+                    next_states_right = [
+                        State(next_obs_right[i], rights[:, i])
+                        for i in range(len(valid_features))
+                    ]
+
+                    # Perform transitions and append states
+                    for i in range(len(valid_features)):
+                        actions[i].transition(0, p_left[i], next_states_left[i])
+                        tmp.append(next_states_left[i])
+
+                    for i in range(len(valid_features)):
+                        actions[i].transition(0, p_right[i], next_states_right[i])
+                        tmp.append(next_states_right[i])
+
+                    [node.add_action(action) for action in actions]
 
             if tmp != []:
                 deci_nodes.append(tmp)
@@ -298,7 +325,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             a = init_a
             o = self.init_o_.copy()
             H = 0
-            while isinstance(a, list):  # a is int implies leaf node
+            while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
                 H += 1
                 if x[feature] <= threshold:
@@ -336,7 +363,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             a = init_a
             o = self.init_o_.copy()
             H = 0
-            while isinstance(a, list):  # a is int implies leaf node
+            while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
                 H += 1
                 if s[feature] <= threshold:
