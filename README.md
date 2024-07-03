@@ -4,7 +4,7 @@ Finding an optimal decision tree for a supervised learning task is a challenging
 
 ## Installation
 ```bash
-pip install git+https://github.com/KohlerHECTOR/dpdt-py
+pip install git+https://github.com/KohlerHECTOR/dpdt-py.git@v0.1.4
 ```
 
 
