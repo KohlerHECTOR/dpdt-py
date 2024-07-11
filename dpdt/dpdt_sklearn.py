@@ -18,7 +18,9 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         The maximum depth of the tree.
     max_nb_trees : int, default=1000
         The maximum number of trees.
-    cart_nodes_list : list of int, default=[3]
+    random_state : int, default=42
+        Fixes randomness of the classifier. Randomness happens in the calls to cart.
+    cart_nodes_list : list of int, default=(3,)
         List containing the number of leaf nodes for the CART trees at each depth.
 
     Attributes
@@ -222,15 +224,15 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                         for i in range(len(valid_features))
                     ]
 
-                    # Perform transitions and append states
+                    # Perform transitions and append states, the reward is equal to the feature cost.
                     for i in range(len(valid_features)):
                         if lefts[:, i].astype(int).sum() > 0:
-                            actions[i].transition(0, p_left[i], next_states_left[i])
+                            actions[i].transition(self.costs_[actions[i].action[0]], p_left[i], next_states_left[i])
                             tmp.append(next_states_left[i])
 
                     for i in range(len(valid_features)):
                         if rights[:, i].astype(int).sum() > 0:
-                            actions[i].transition(0, p_right[i], next_states_right[i])
+                            actions[i].transition(self.costs_[actions[i].action[0]], p_right[i], next_states_right[i])
                             tmp.append(next_states_right[i])
 
                     [
@@ -247,7 +249,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         return deci_nodes
 
     @_fit_context(prefer_skip_nested_validation=True)
-    def fit(self, X, y):
+    def fit(self, X, y, feature_costs=None):
         """
         Fit the DPDTree classifier.
 
@@ -257,6 +259,8 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             The training input samples.
         y : array-like of shape (n_samples,)
             The target values.
+        feature_costs (optional): list of float, default=None
+            List containing the features costs.
 
         Returns
         -------
@@ -265,6 +269,19 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         """
 
         X, y = self._validate_data(X, y)
+        if feature_costs:
+            assert len(feature_costs) == X.shape[1], "There should be as much feature costs as features."
+            assert all([fc >= 1 for fc in feature_costs]), "Feature costs must be greater than 1."
+            
+        else:
+            feature_costs = np.ones(X.shape[1])
+
+        min_cost, max_cost = min(feature_costs), max(feature_costs)
+        if min_cost != max_cost:
+            # Normalize feature costs in 0 1
+            self.costs_ = [(fc - min_cost)/(max_cost - min_cost) for fc in feature_costs]
+        else:
+            self.costs_ = [fc / min_cost for fc in feature_costs]
         # We need to make sure that we have a classification task
         check_classification_targets(y)
 
@@ -281,6 +298,8 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             self.zetas_ = np.linspace(-1, 0, self.max_nb_trees)
             assert len(self.zetas_) == self.max_nb_trees
 
+        
+        self.costs_zeta_matrix_ = np.outer(self.costs_, self.zetas_)
         self.mdp_ = self.build_mdp()
         self.init_o_ = self.mdp_[0][0].obs
         self.trees_ = backward_induction_multiple_zetas(self.mdp_, self.zetas_)
