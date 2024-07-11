@@ -3,3 +3,4 @@ __pycache__
 dpdt_py.egg-info
 docs/_build
 docs/generated
+*.json*

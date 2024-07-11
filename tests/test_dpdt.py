@@ -55,3 +55,20 @@ def test_better_cart(n_samples, n_features, centers, max_depth, cart_nodes_list)
     cart = DecisionTreeClassifier(max_depth=max_depth, random_state=clf.random_state)
     cart.fit(X, y)
     assert clf.score(X, y) >= cart.score(X, y)
+
+
+@pytest.mark.xfail(raises=AssertionError)
+@pytest.mark.parametrize("costs",[(1,1,2), (0,1,1,1,1)])
+def test_feature_costs(costs):
+    X, y = make_blobs(100, centers=2, n_features=5, random_state=0)
+    y = y.reshape(-1, 1)
+    clf = DPDTree(4)
+    clf.fit(X, y, feature_costs=costs)
+
+
+@pytest.mark.parametrize("costs",[(1,1,1,1,1), (10,1.5,1,4,1)])
+def test_feature_costs(costs):
+    X, y = make_blobs(100, centers=2, n_features=5, random_state=0)
+    y = y.reshape(-1, 1)
+    clf = DPDTree(4)
+    clf.fit(X, y, feature_costs=costs)

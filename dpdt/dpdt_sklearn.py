@@ -18,7 +18,9 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         The maximum depth of the tree.
     max_nb_trees : int, default=1000
         The maximum number of trees.
-    cart_nodes_list : list of int, default=[3]
+    random_state : int, default=42
+        Fixes randomness of the classifier. Randomness happens in the calls to cart.
+    cart_nodes_list : list of int, default=(3,)
         List containing the number of leaf nodes for the CART trees at each depth.
 
     Attributes
@@ -222,15 +224,15 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                         for i in range(len(valid_features))
                     ]
 
-                    # Perform transitions and append states
+                    # Perform transitions and append states, the reward is equal to the feature cost.
                     for i in range(len(valid_features)):
                         if lefts[:, i].astype(int).sum() > 0:
-                            actions[i].transition(0, p_left[i], next_states_left[i])
+                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_left[i], next_states_left[i])
                             tmp.append(next_states_left[i])
 
                     for i in range(len(valid_features)):
                         if rights[:, i].astype(int).sum() > 0:
-                            actions[i].transition(0, p_right[i], next_states_right[i])
+                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_right[i], next_states_right[i])
                             tmp.append(next_states_right[i])
 
                     [
@@ -247,7 +249,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         return deci_nodes
 
     @_fit_context(prefer_skip_nested_validation=True)
-    def fit(self, X, y):
+    def fit(self, X, y, feature_costs=None):
         """
         Fit the DPDTree classifier.
 
@@ -257,6 +259,8 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             The training input samples.
         y : array-like of shape (n_samples,)
             The target values.
+        feature_costs (optional): list of float, default=None
+            List containing the features costs.
 
         Returns
         -------
@@ -265,6 +269,16 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         """
 
         X, y = self._validate_data(X, y)
+        if feature_costs:
+            assert len(feature_costs) == X.shape[1], "There should be as much feature costs as features."
+            assert all([fc >= 1 for fc in feature_costs]), "Feature costs must be greater than 1."
+            min_cost, max_cost = min(feature_costs), max(feature_costs)
+            if min_cost == max_cost:
+                feature_costs = [1 for _ in feature_costs]
+            self.feature_costs_ = feature_costs
+        else:
+            self.feature_costs_= np.ones(X.shape[1])
+            
         # We need to make sure that we have a classification task
         check_classification_targets(y)
 
@@ -281,6 +295,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             self.zetas_ = np.linspace(-1, 0, self.max_nb_trees)
             assert len(self.zetas_) == self.max_nb_trees
 
+        
         self.mdp_ = self.build_mdp()
         self.init_o_ = self.mdp_[0][0].obs
         self.trees_ = backward_induction_multiple_zetas(self.mdp_, self.zetas_)
@@ -366,14 +381,16 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         """
         nb_features = X.shape[1]
         init_a = self.trees_[tuple(self.init_o_.tolist() + [0])][zeta_index]
-        lengths = np.zeros(X.shape[0])
+        lengths, costs = np.zeros(X.shape[0]), np.zeros(X.shape[0])
         for i, s in enumerate(X):
             a = init_a
             o = self.init_o_.copy()
             H = 0
+            cost = 0
             while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
                 H += 1
+                cost += self.feature_costs_[feature]
                 if s[feature] <= threshold:
                     o[nb_features + feature] = threshold
                 else:
@@ -381,6 +398,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                 a = self.trees_[tuple(o.tolist() + [H])][zeta_index]
 
             lengths[i] = H
+            costs[i] = cost
         return (
             sum(
                 [
@@ -390,6 +408,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             )
             / len(X),
             lengths.mean(),
+            costs.mean()
         )
 
     def get_pareto_front(self, X, y):
@@ -412,8 +431,9 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         """
         scores = np.zeros(len(self.zetas_))
         decision_path_length = np.zeros(len(self.zetas_))
+        cost = np.zeros(len(self.zetas_))
         for z in range(len(self.zetas_)):
-            scores[z], decision_path_length[z] = self.average_traj_length_in_mdp_(
+            scores[z], decision_path_length[z], cost[z] = self.average_traj_length_in_mdp_(
                 X, y, z
             )
-        return scores, decision_path_length
+        return scores, decision_path_length, cost
