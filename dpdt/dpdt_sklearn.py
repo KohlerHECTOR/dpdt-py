@@ -227,12 +227,12 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                     # Perform transitions and append states, the reward is equal to the feature cost.
                     for i in range(len(valid_features)):
                         if lefts[:, i].astype(int).sum() > 0:
-                            actions[i].transition(self.costs_[actions[i].action[0]], p_left[i], next_states_left[i])
+                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_left[i], next_states_left[i])
                             tmp.append(next_states_left[i])
 
                     for i in range(len(valid_features)):
                         if rights[:, i].astype(int).sum() > 0:
-                            actions[i].transition(self.costs_[actions[i].action[0]], p_right[i], next_states_right[i])
+                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_right[i], next_states_right[i])
                             tmp.append(next_states_right[i])
 
                     [
@@ -272,16 +272,13 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         if feature_costs:
             assert len(feature_costs) == X.shape[1], "There should be as much feature costs as features."
             assert all([fc >= 1 for fc in feature_costs]), "Feature costs must be greater than 1."
+            min_cost, max_cost = min(feature_costs), max(feature_costs)
+            if min_cost == max_cost:
+                feature_costs = [1 for _ in feature_costs]
+            self.feature_costs_ = feature_costs
+        else:
+            self.feature_costs_= np.ones(X.shape[1])
             
-        else:
-            feature_costs = np.ones(X.shape[1])
-
-        min_cost, max_cost = min(feature_costs), max(feature_costs)
-        if min_cost != max_cost:
-            # Normalize feature costs in 0 1
-            self.costs_ = [(fc - min_cost)/(max_cost - min_cost) for fc in feature_costs]
-        else:
-            self.costs_ = [fc / min_cost for fc in feature_costs]
         # We need to make sure that we have a classification task
         check_classification_targets(y)
 
@@ -299,7 +296,6 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             assert len(self.zetas_) == self.max_nb_trees
 
         
-        self.costs_zeta_matrix_ = np.outer(self.costs_, self.zetas_)
         self.mdp_ = self.build_mdp()
         self.init_o_ = self.mdp_[0][0].obs
         self.trees_ = backward_induction_multiple_zetas(self.mdp_, self.zetas_)
@@ -385,14 +381,16 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         """
         nb_features = X.shape[1]
         init_a = self.trees_[tuple(self.init_o_.tolist() + [0])][zeta_index]
-        lengths = np.zeros(X.shape[0])
+        lengths, costs = np.zeros(X.shape[0]), np.zeros(X.shape[0])
         for i, s in enumerate(X):
             a = init_a
             o = self.init_o_.copy()
             H = 0
+            cost = 0
             while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
                 H += 1
+                cost += self.feature_costs_[feature]
                 if s[feature] <= threshold:
                     o[nb_features + feature] = threshold
                 else:
@@ -400,6 +398,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
                 a = self.trees_[tuple(o.tolist() + [H])][zeta_index]
 
             lengths[i] = H
+            costs[i] = cost
         return (
             sum(
                 [
@@ -409,6 +408,7 @@ class DPDTree(ClassifierMixin, BaseEstimator):
             )
             / len(X),
             lengths.mean(),
+            costs.mean()
         )
 
     def get_pareto_front(self, X, y):
@@ -431,8 +431,9 @@ class DPDTree(ClassifierMixin, BaseEstimator):
         """
         scores = np.zeros(len(self.zetas_))
         decision_path_length = np.zeros(len(self.zetas_))
+        cost = np.zeros(len(self.zetas_))
         for z in range(len(self.zetas_)):
-            scores[z], decision_path_length[z] = self.average_traj_length_in_mdp_(
+            scores[z], decision_path_length[z], cost[z] = self.average_traj_length_in_mdp_(
                 X, y, z
             )
-        return scores, decision_path_length
+        return scores, decision_path_length, cost

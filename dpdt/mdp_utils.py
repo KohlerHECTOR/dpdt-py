@@ -102,7 +102,8 @@ def backward_induction_multiple_zetas(mdp, zetas):
                 else:
                     q_s_a = np.zeros(zetas.shape[0])
                     for j, s_next in enumerate(a.next_states):
-                        q_s_a += a.probas[j] * (zetas * a.rewards[0] + s_next.v)
+                        regul = zetas * a.rewards[0]
+                        q_s_a += a.probas[j] * (regul + s_next.v) 
                 qs.append(q_s_a)
             qs = np.asarray(qs)
             argmax_qs = np.argmax(qs, axis=0)
