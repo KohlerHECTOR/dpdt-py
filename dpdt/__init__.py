@@ -1,1 +1,1 @@
-from .dpdt_sklearn import DPDTree
+from .dpdt_sklearn import DPDTreeClassifier, DPDTreeRegressor

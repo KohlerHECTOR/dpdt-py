@@ -1,4 +1,4 @@
-from dpdt import DPDTree
+from dpdt import DPDTreeClassifier
 from sklearn.utils.estimator_checks import check_estimator
 import pytest
 from sklearn.datasets import make_blobs
@@ -9,7 +9,7 @@ from sklearn.tree import DecisionTreeClassifier
 @pytest.mark.parametrize("max_nb_trees", [1, 20, 50, 100])
 @pytest.mark.parametrize("cart_nodes_list", [(3,), (3, 5, 4, 1), (6, 6)])
 def test_check_estimator(max_depth, max_nb_trees, cart_nodes_list):
-    check_estimator(DPDTree(max_depth, max_nb_trees, cart_nodes_list))
+    check_estimator(DPDTreeClassifier(max_depth, max_nb_trees, cart_nodes_list))
 
 
 @pytest.mark.parametrize(
@@ -26,7 +26,7 @@ def test_check_estimator(max_depth, max_nb_trees, cart_nodes_list):
 def test_dpdt_learning(n_samples, n_features, max_depth, max_nb_trees, cart_nodes_list):
     X, y = make_blobs(n_samples, centers=2, n_features=n_features, random_state=0)
     y = y.reshape(-1, 1)
-    clf = DPDTree(max_depth, max_nb_trees, cart_nodes_list)
+    clf = DPDTreeClassifier(max_depth, max_nb_trees, cart_nodes_list)
     clf.fit(X, y)
     clf.get_pareto_front(X, y)
     clf.predict(X)
@@ -50,7 +50,7 @@ def test_dpdt_learning(n_samples, n_features, max_depth, max_nb_trees, cart_node
 def test_better_cart(n_samples, n_features, centers, max_depth, cart_nodes_list):
     X, y = make_blobs(n_samples, centers=centers, n_features=n_features, random_state=0)
     y = y.reshape(-1, 1)
-    clf = DPDTree(max_depth, cart_nodes_list=cart_nodes_list)
+    clf = DPDTreeClassifier(max_depth, cart_nodes_list=cart_nodes_list)
     clf.fit(X, y)
     cart = DecisionTreeClassifier(max_depth=max_depth, random_state=clf.random_state)
     cart.fit(X, y)
@@ -62,7 +62,7 @@ def test_better_cart(n_samples, n_features, centers, max_depth, cart_nodes_list)
 def test_feature_costs(costs):
     X, y = make_blobs(100, centers=2, n_features=5, random_state=0)
     y = y.reshape(-1, 1)
-    clf = DPDTree(4)
+    clf = DPDTreeClassifier(4)
     clf.fit(X, y, feature_costs=costs)
 
 
@@ -70,5 +70,11 @@ def test_feature_costs(costs):
 def test_feature_costs(costs):
     X, y = make_blobs(100, centers=2, n_features=5, random_state=0)
     y = y.reshape(-1, 1)
-    clf = DPDTree(4)
+    clf = DPDTreeClassifier(4)
     clf.fit(X, y, feature_costs=costs)
+
+
+
+
+
+
