@@ -14,7 +14,7 @@ Main class
   :toctree: generated/
   :template: class.rst
 
-    dpdt.DPDTree
+    dpdt.DPDTreeClassifier
 
 Main functions
 ==============
@@ -23,7 +23,7 @@ Main functions
   :toctree: generated/
   :template: function.rst
 
-    dpdt.DPDTree.build_mdp
-    dpdt.DPDTree.get_pareto_front
+    dpdt.DPDTreeClassifier.build_mdp
+    dpdt.DPDTreeClassifier.get_pareto_front
 
     
