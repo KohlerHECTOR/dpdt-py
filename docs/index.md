@@ -4,7 +4,7 @@ Finding an optimal decision tree for a supervised learning task is a challenging
 ![Avila](avila.png).
 
 It is also possible to add feature costs when fitting the tree. 
-It is also possible to do regression.
+It is also possible to do regression, including multi-output regression.
 
 ## Usage
 

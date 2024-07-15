@@ -3,11 +3,11 @@ Finding an optimal decision tree for a supervised learning task is a challenging
 ![Avila](docs/avila.png)
 
 It is also possible to add feature costs when fitting the tree.  
-It is also possible to do regression.
+It is also possible to do regression, including multi-output regression.
 
 ## Installation
 ```bash
-pip install git+https://github.com/KohlerHECTOR/dpdt-py.git@v0.1.6
+pip install git+https://github.com/KohlerHECTOR/dpdt-py.git@v0.1.7
 ```
 
 

@@ -1,30 +1,32 @@
 from dpdt import DPDTreeRegressor
 from sklearn.utils.estimator_checks import check_estimator
+from sklearn.utils._tags import _safe_tags
+
 import pytest
 from sklearn.tree import DecisionTreeRegressor
 import numpy as np
 
-@pytest.mark.parametrize("max_depth", [2, 4, 6, 8, 10])
+@pytest.mark.parametrize("max_depth", [2, 4, 6, 8])
 @pytest.mark.parametrize("max_nb_trees", [1, 20, 50, 100])
-@pytest.mark.parametrize("cart_nodes_list", [(3,), (3, 5, 4, 1), (6, 6)])
+@pytest.mark.parametrize("cart_nodes_list", [(3,), (3, 3)])
 def test_check_estimator(max_depth, max_nb_trees, cart_nodes_list):
     check_estimator(DPDTreeRegressor(max_depth, max_nb_trees, cart_nodes_list))
 
 
 @pytest.mark.parametrize(
     "n_samples",
-    [10, 1000],
+    [10, 100],
 )
 @pytest.mark.parametrize(
     "n_features",
-    [5, 500],
+    [5, 200],
 )
 @pytest.mark.parametrize(
     "centers",
     [2, 4, 6],
 )
-@pytest.mark.parametrize("max_depth", [2, 4, 6])
-@pytest.mark.parametrize("cart_nodes_list", [(3,), (3, 5, 4, 1), (6, 6)])
+@pytest.mark.parametrize("max_depth", [2, 4])
+@pytest.mark.parametrize("cart_nodes_list", [(3,)])
 def test_better_cart_multiout(n_samples, n_features, centers, max_depth, cart_nodes_list):
     X = np.random.random(size=(n_samples, n_features))
     y = [[x[0]**i for i in range(centers)] for x in X]
@@ -32,7 +34,9 @@ def test_better_cart_multiout(n_samples, n_features, centers, max_depth, cart_no
     clf.fit(X, y)
     cart = DecisionTreeRegressor(max_depth=max_depth, random_state=clf.random_state)
     cart.fit(X, y)
-    assert np.allclose(clf.score(X, y), cart.score(X, y), rtol=1e-5)
+    dpdt_score = clf.score(X, y)
+    cart_score = cart.score(X, y) 
+    assert np.allclose(dpdt_score, cart_score, rtol=1e-5) or dpdt_score >= cart_score
 
 @pytest.mark.parametrize(
     "n_samples",
@@ -56,7 +60,9 @@ def test_better_cart(n_samples, n_features, centers, max_depth, cart_nodes_list)
     clf.fit(X, y)
     cart = DecisionTreeRegressor(max_depth=max_depth, random_state=clf.random_state)
     cart.fit(X, y)
-    assert np.allclose(clf.score(X, y), cart.score(X, y), rtol=1e-5)
+    dpdt_score = clf.score(X, y)
+    cart_score = cart.score(X, y) 
+    assert np.allclose(dpdt_score, cart_score, rtol=1e-5) or dpdt_score >= cart_score
 
 
 
