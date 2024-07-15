@@ -1,7 +1,7 @@
 import numpy as np
-from sklearn.base import BaseEstimator, ClassifierMixin, _fit_context, RegressorMixin
+from sklearn.base import BaseEstimator, ClassifierMixin, _fit_context, RegressorMixin, MultiOutputMixin
 from sklearn.utils.multiclass import check_classification_targets
-from sklearn.utils.validation import check_is_fitted, check_X_y
+from sklearn.utils.validation import check_is_fitted, check_X_y, check_array
 from sklearn.utils._param_validation import Interval
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.metrics import mean_squared_error
@@ -146,7 +146,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
 
         while d < max_depth:
             tmp = []
-            for node in deci_nodes[d]:
+            for node in deci_nodes[d]:# Should be parallel
                 obs = node.obs.copy()
                 classes, counts = np.unique(self.y_[node.nz], return_counts=True)
                 rstar = max(counts) / node.nz.sum() - 1.0
@@ -440,7 +440,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         return scores, decision_path_length, cost
     
 
-class DPDTreeRegressor(RegressorMixin, BaseEstimator):
+class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
     """
     Dynamic Programming Decision Tree (DPDTree) regressor.
 
@@ -566,13 +566,10 @@ class DPDTreeRegressor(RegressorMixin, BaseEstimator):
 
         while d < max_depth:
             tmp = []
-            for node in deci_nodes[d]:
+            for node in deci_nodes[d]: # Should be parallel
                 obs = node.obs.copy()
                 astar = self.y_[node.nz].mean(axis=0)
-                if isinstance(astar, float):
-                    rstar = -1 * mean_squared_error(self.y_[node.nz], [astar] * len(self.y_[node.nz]))
-                else:
-                    rstar = -1 * mean_squared_error(self.y_[node.nz], np.tile(astar, (len(self.y_[node.nz]), 1)))
+                rstar = -1 * mean_squared_error(self.y_[node.nz], np.tile(astar, (len(self.y_[node.nz]), 1)))
                 next_state = State(terminal_state, [0], is_terminal=True)
                 next_state.qs = [rstar]
                 a = Action(astar)
@@ -690,16 +687,9 @@ class DPDTreeRegressor(RegressorMixin, BaseEstimator):
         self : object
             Fitted estimator.
         """
+        X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
+        self._check_n_features(X, reset=True)
 
-        # check_X_params = dict(
-        #         accept_sparse=False, force_all_finite=True
-        #     )
-        # check_y_params = dict(ensure_2d=False, dtype=None)
-        # X, y = self._validate_data(
-        #     X, y, validate_separately=(check_X_params, check_y_params)
-        # )
-        X, y = check_X_y(X, y)
-        
         if feature_costs:
             assert len(feature_costs) == X.shape[1], "There should be as much feature costs as features."
             assert all([fc >= 1 for fc in feature_costs]), "Feature costs must be greater than 1."
@@ -712,8 +702,7 @@ class DPDTreeRegressor(RegressorMixin, BaseEstimator):
             
         # Store the training data to predict later
         self.X_ = X
-        self.y_ = y
-
+        self.y_ = y.astype(float)
         if self.max_nb_trees < 2:
             self.zetas_ = np.zeros(1)
         else:
@@ -747,7 +736,7 @@ class DPDTreeRegressor(RegressorMixin, BaseEstimator):
         # Input validation
         # We need to set reset=False because we don't want to overwrite `n_features_in_`
         # `feature_names_in_` but only check that the shape is consistent.
-        X = self._validate_data(X, reset=False)
+        X = check_array(X)
         return self.predict_zeta_(X, -1)
 
     def predict_zeta_(self, X, zeta_index):
