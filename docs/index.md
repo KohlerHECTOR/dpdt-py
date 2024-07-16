@@ -8,7 +8,6 @@ It is also possible to do regression, including multi-output regression.
 
 ## Usage
 
-
 Information on how to use DPDT library.
 
 ```{toctree}
