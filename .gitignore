@@ -4,3 +4,4 @@ dpdt_py.egg-info
 docs/_build
 docs/generated
 *.json*
+*.egg-info
