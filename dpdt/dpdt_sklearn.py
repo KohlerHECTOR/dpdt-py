@@ -1,5 +1,11 @@
 import numpy as np
-from sklearn.base import BaseEstimator, ClassifierMixin, _fit_context, RegressorMixin, MultiOutputMixin
+from sklearn.base import (
+    BaseEstimator,
+    ClassifierMixin,
+    _fit_context,
+    RegressorMixin,
+    MultiOutputMixin,
+)
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y, check_array
 from sklearn.utils._param_validation import Interval
@@ -146,7 +152,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
 
         while d < max_depth:
             tmp = []
-            for node in deci_nodes[d]:# Should be parallel
+            for node in deci_nodes[d]:  # Should be parallel
                 obs = node.obs.copy()
                 classes, counts = np.unique(self.y_[node.nz], return_counts=True)
                 rstar = max(counts) / node.nz.sum() - 1.0
@@ -228,12 +234,20 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
                     # Perform transitions and append states, the reward is equal to the feature cost.
                     for i in range(len(valid_features)):
                         if lefts[:, i].astype(int).sum() > 0:
-                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_left[i], next_states_left[i])
+                            actions[i].transition(
+                                self.feature_costs_[actions[i].action[0]],
+                                p_left[i],
+                                next_states_left[i],
+                            )
                             tmp.append(next_states_left[i])
 
                     for i in range(len(valid_features)):
                         if rights[:, i].astype(int).sum() > 0:
-                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_right[i], next_states_right[i])
+                            actions[i].transition(
+                                self.feature_costs_[actions[i].action[0]],
+                                p_right[i],
+                                next_states_right[i],
+                            )
                             tmp.append(next_states_right[i])
 
                     [
@@ -271,15 +285,19 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
 
         X, y = self._validate_data(X, y)
         if feature_costs:
-            assert len(feature_costs) == X.shape[1], "There should be as much feature costs as features."
-            assert all([fc >= 1 for fc in feature_costs]), "Feature costs must be greater than 1."
+            assert (
+                len(feature_costs) == X.shape[1]
+            ), "There should be as much feature costs as features."
+            assert all(
+                [fc >= 1 for fc in feature_costs]
+            ), "Feature costs must be greater than 1."
             min_cost, max_cost = min(feature_costs), max(feature_costs)
             if min_cost == max_cost:
                 feature_costs = [1 for _ in feature_costs]
             self.feature_costs_ = feature_costs
         else:
-            self.feature_costs_= np.ones(X.shape[1])
-            
+            self.feature_costs_ = np.ones(X.shape[1])
+
         # We need to make sure that we have a classification task
         check_classification_targets(y)
 
@@ -296,7 +314,6 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             self.zetas_ = np.linspace(-1, 0, self.max_nb_trees)
             assert len(self.zetas_) == self.max_nb_trees
 
-        
         self.mdp_ = self.build_mdp()
         self.init_o_ = self.mdp_[0][0].obs
         self.trees_ = backward_induction_multiple_zetas(self.mdp_, self.zetas_)
@@ -409,7 +426,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             )
             / len(X),
             lengths.mean(),
-            costs.mean()
+            costs.mean(),
         )
 
     def get_pareto_front(self, X, y):
@@ -434,11 +451,13 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         decision_path_length = np.zeros(len(self.zetas_))
         cost = np.zeros(len(self.zetas_))
         for z in range(len(self.zetas_)):
-            scores[z], decision_path_length[z], cost[z] = self.average_traj_length_in_mdp_(
-                X, y, z
-            )
+            (
+                scores[z],
+                decision_path_length[z],
+                cost[z],
+            ) = self.average_traj_length_in_mdp_(X, y, z)
         return scores, decision_path_length, cost
-    
+
 
 class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
     """
@@ -566,10 +585,12 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
 
         while d < max_depth:
             tmp = []
-            for node in deci_nodes[d]: # Should be parallel
+            for node in deci_nodes[d]:  # Should be parallel
                 obs = node.obs.copy()
                 astar = self.y_[node.nz].mean(axis=0)
-                rstar = -1 * mean_squared_error(self.y_[node.nz], np.tile(astar, (len(self.y_[node.nz]), 1)))
+                rstar = -1 * mean_squared_error(
+                    self.y_[node.nz], np.tile(astar, (len(self.y_[node.nz]), 1))
+                )
                 next_state = State(terminal_state, [0], is_terminal=True)
                 next_state.qs = [rstar]
                 a = Action(astar)
@@ -646,17 +667,22 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
 
                     # Perform transitions and append states, the reward is equal to the feature cost.
                     for i in range(len(valid_features)):
-                        actions[i].transition(self.feature_costs_[actions[i].action[0]], p_left[i], next_states_left[i])
+                        actions[i].transition(
+                            self.feature_costs_[actions[i].action[0]],
+                            p_left[i],
+                            next_states_left[i],
+                        )
                         tmp.append(next_states_left[i])
 
                     for i in range(len(valid_features)):
-                        actions[i].transition(self.feature_costs_[actions[i].action[0]], p_right[i], next_states_right[i])
+                        actions[i].transition(
+                            self.feature_costs_[actions[i].action[0]],
+                            p_right[i],
+                            next_states_right[i],
+                        )
                         tmp.append(next_states_right[i])
 
-                    [
-                        node.add_action(action)
-                        for action in actions
-                    ]
+                    [node.add_action(action) for action in actions]
 
             if tmp != []:
                 deci_nodes.append(tmp)
@@ -688,15 +714,19 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
         self._check_n_features(X, reset=True)
 
         if feature_costs:
-            assert len(feature_costs) == X.shape[1], "There should be as much feature costs as features."
-            assert all([fc >= 1 for fc in feature_costs]), "Feature costs must be greater than 1."
+            assert (
+                len(feature_costs) == X.shape[1]
+            ), "There should be as much feature costs as features."
+            assert all(
+                [fc >= 1 for fc in feature_costs]
+            ), "Feature costs must be greater than 1."
             min_cost, max_cost = min(feature_costs), max(feature_costs)
             if min_cost == max_cost:
                 feature_costs = [1 for _ in feature_costs]
             self.feature_costs_ = feature_costs
         else:
-            self.feature_costs_= np.ones(X.shape[1])
-            
+            self.feature_costs_ = np.ones(X.shape[1])
+
         # Store the training data to predict later
         self.X_ = X
         self.y_ = y.astype(float)
@@ -706,7 +736,6 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             self.zetas_ = np.linspace(-1, 0, self.max_nb_trees)
             assert len(self.zetas_) == self.max_nb_trees
 
-        
         self.mdp_ = self.build_mdp()
         self.init_o_ = self.mdp_[0][0].obs
         self.trees_ = backward_induction_multiple_zetas(self.mdp_, self.zetas_)
@@ -754,7 +783,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
         """
         # X = np.array(X, dtype=np.float64)
         init_a = self.trees_[tuple(self.init_o_.tolist() + [0])][zeta_index]
-        if self.y_.ndim>1:
+        if self.y_.ndim > 1:
             y_pred = np.zeros((len(X), self.y_.shape[1]), dtype=self.y_.dtype)
         else:
             y_pred = np.zeros((len(X)), dtype=self.y_.dtype)
@@ -816,13 +845,12 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
         return (
             np.mean(
                 [
-                    (y[i] - self.predict_zeta_(X[i].reshape(1, -1), zeta_index)[0])**2
+                    (y[i] - self.predict_zeta_(X[i].reshape(1, -1), zeta_index)[0]) ** 2
                     for i in range(len(X))
                 ]
-            )
-            ,
+            ),
             lengths.mean(),
-            costs.mean()
+            costs.mean(),
         )
 
     def get_pareto_front(self, X, y):
@@ -847,7 +875,9 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
         decision_path_length = np.zeros(len(self.zetas_))
         cost = np.zeros(len(self.zetas_))
         for z in range(len(self.zetas_)):
-            scores[z], decision_path_length[z], cost[z] = self.average_traj_length_in_mdp_(
-                X, y, z
-            )
+            (
+                scores[z],
+                decision_path_length[z],
+                cost[z],
+            ) = self.average_traj_length_in_mdp_(X, y, z)
         return scores, decision_path_length, cost

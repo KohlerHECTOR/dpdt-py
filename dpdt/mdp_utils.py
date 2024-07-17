@@ -98,12 +98,14 @@ def backward_induction_multiple_zetas(mdp, zetas):
             qs = []
             for a in node.actions:
                 if not isinstance(a.action, tuple):
-                    q_s_a = np.ones(zetas.shape[0]) * a.rewards[0] # here the reward is misclassif cost.
+                    q_s_a = (
+                        np.ones(zetas.shape[0]) * a.rewards[0]
+                    )  # here the reward is misclassif cost.
                 else:
                     q_s_a = np.zeros(zetas.shape[0])
                     for j, s_next in enumerate(a.next_states):
                         regul = zetas * a.rewards[0]
-                        q_s_a += a.probas[j] * (regul + s_next.v) 
+                        q_s_a += a.probas[j] * (regul + s_next.v)
                 qs.append(q_s_a)
             qs = np.asarray(qs)
             argmax_qs = np.argmax(qs, axis=0)

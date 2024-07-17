@@ -58,7 +58,7 @@ def test_better_cart(n_samples, n_features, centers, max_depth, cart_nodes_list)
 
 
 @pytest.mark.xfail(raises=AssertionError)
-@pytest.mark.parametrize("costs",[(1,1,2), (0,1,1,1,1)])
+@pytest.mark.parametrize("costs", [(1, 1, 2), (0, 1, 1, 1, 1)])
 def test_feature_costs(costs):
     X, y = make_blobs(100, centers=2, n_features=5, random_state=0)
     y = y.reshape(-1, 1)
@@ -66,15 +66,9 @@ def test_feature_costs(costs):
     clf.fit(X, y, feature_costs=costs)
 
 
-@pytest.mark.parametrize("costs",[(1,1,1,1,1), (10,1.5,1,4,1)])
+@pytest.mark.parametrize("costs", [(1, 1, 1, 1, 1), (10, 1.5, 1, 4, 1)])
 def test_feature_costs(costs):
     X, y = make_blobs(100, centers=2, n_features=5, random_state=0)
     y = y.reshape(-1, 1)
     clf = DPDTreeClassifier(4)
     clf.fit(X, y, feature_costs=costs)
-
-
-
-
-
-
