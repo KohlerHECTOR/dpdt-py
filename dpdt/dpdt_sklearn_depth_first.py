@@ -6,10 +6,10 @@ from sklearn.utils._param_validation import Interval
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.metrics import mean_squared_error
 from .mdp_utils import backward_induction_multiple_zetas, Action, State
-from numbers import Integral, Real
+from numbers import Integral
 
 
-class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
+class DPDTreeClassifierDepthFirst(ClassifierMixin, BaseEstimator):
     """
     Dynamic Programming Decision Tree (DPDTree) classifier.
 
@@ -86,168 +86,115 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         self.cart_nodes_list = cart_nodes_list
         self.random_state = random_state
 
-    def build_mdp(self):
-        """
-        Build the Markov Decision Process (MDP) for the trees.
-
-        This method constructs an MDP using a breadth-first search approach. Each node in the tree represents a state in the MDP,
-        and actions are determined based on potential splits from a decision tree classifier.
-
-        1. Initialization:
-            - Sets `max_depth` to `self.max_depth + 1`.
-            - Creates a `root` state with the concatenated minimum and maximum values of `self.X_` with slight offsets.
-            - Initializes a `terminal_state` as an array of zeros with a length of twice the number of features in `self.X_`.
-
-        2. Root State:
-            - Initializes the `root` state with all samples (`nz` as an array of `True` values).
-            - `deci_nodes` is a list of lists where each inner list holds nodes at a certain depth, starting with the `root`.
-
-        3. Breadth-First Search:
-            - Uses a breadth-first search to expand nodes up to the specified `max_depth`.
-            - For each node at depth `d`, creates a temporary list `tmp` to store the new nodes created at depth `d + 1`.
-
-        4. Node Expansion:
-            - For each node at the current depth, calculates the unique classes and their counts for the samples in the node (`node.nz`).
-            - Computes the best possible reward (`rstar`) and the action (`astar`) leading to the next state.
-            - If further expansion is possible (i.e., depth budget allows and there are at least two classes), initializes a `DecisionTreeClassifier` to determine the splits.
-            - Fits the classifier on the samples in the node, and identifies potential splits (features and thresholds).
-
-        5. Action Creation and Transition:
-            - For each split, creates an `Action` and determines the left and right child nodes based on the split.
-            - Creates the left and right nodes as new states, and adds transitions to the action.
-            - If an action has valid transitions, adds it to the current node.
-
-        6. Depth Advancement:
-            - If new nodes are created (`tmp` is not empty), adds them to `deci_nodes`, and increments the depth counter (`d`).
-            - If no new nodes are created, the process stops.
-
-        Returns
-        -------
-        deci_nodes : list
-            A list of lists, where each inner list contains the decision nodes at a specific depth of the tree.
-
-        Notes
-        -----
-        This is an implementation of Algortihm 1 from [1]_ .
-
-        References
-        ----------
-
-        .. [1] H. Kohler et. al., "Interpretable Decision Tree Search as a Markov Decision Process" arXiv https://arxiv.org/abs/2309.12701.
-        """
-        max_depth = self.max_depth + 1
-        root = State(
-            np.concatenate((self.X_.min(axis=0) - 1e-3, self.X_.max(axis=0) + 1e-3)),
-            nz=np.ones(self.X_.shape[0], dtype=np.bool_),
-        )
-        terminal_state = np.zeros(2 * self.X_.shape[1])
-        deci_nodes = [[root]]
-        d = 0
-
-        while d < max_depth:
-            tmp = []
-            for node in deci_nodes[d]:# Should be parallel
-                obs = node.obs.copy()
-                classes, counts = np.unique(self.y_[node.nz], return_counts=True)
-                rstar = max(counts) / node.nz.sum() - 1.0
-                astar = classes[np.argmax(counts)]
-                next_state = State(terminal_state, [0], is_terminal=True)
-                next_state.qs = [rstar]
-                a = Action(astar)
-                a.transition(rstar, 1, next_state)
-                node.add_action(a)
-                # If there is still depth budget and the current split has more than 1 class:
-                if (d + 1) < max_depth and rstar < 0:
-                    # Get the splits from CART
-                    # Note that that 2 leaf nodes means that the split is greedy.
-                    if d <= len(self.cart_nodes_list) - 1:
-                        clf = DecisionTreeClassifier(
-                            max_leaf_nodes=max(2, self.cart_nodes_list[d]),
-                            random_state=self.random_state,
-                        )
-                    # If depth budget reaches limit, get the max entropy split.
-                    else:
-                        clf = DecisionTreeClassifier(
-                            max_leaf_nodes=2, random_state=self.random_state
-                        )
-
-                    clf.fit(self.X_[node.nz], self.y_[node.nz])
-
-                    # Extract the splits from the CART tree.
-
-                    masks = clf.tree_.feature >= 0  # get tested features.
-
-                    # Apply mask to features and thresholds to get valid indices
-                    valid_features = clf.tree_.feature[masks]
-                    valid_thresholds = clf.tree_.threshold[masks]
-                    lefts = (
-                        self.X_[:, valid_features] <= valid_thresholds
-                    )  # is a 2D array with nb CART tree tests columns.
-                    rights = np.logical_not(
-                        lefts
-                    )  # as many rows as data in the whole training set.
-
-                    # Masking data passing threshold and precedent thresholds.
-                    lefts *= node.nz[:, np.newaxis]
-                    rights *= node.nz[:, np.newaxis]
-
-                    # Compute probabilities
-                    p_left = lefts.sum(axis=0) / node.nz.sum()  # summing column values.
-                    # In each column (tested features), non-zero values are data indices passing all tests so far in the MDP trajectory.
-                    p_right = 1 - p_left
-
-                    feat_thresh = list(
-                        zip(valid_features, valid_thresholds)
-                    )  # len of the list is nb tests in CART tree.
-
-                    # Precompute next observations for left and right splits
-                    next_obs_left = np.tile(obs, (len(feat_thresh), 1))
-                    next_obs_right = np.tile(obs, (len(feat_thresh), 1))
-                    indices = np.arange(len(feat_thresh))
-
-                    # Fast next obs computations. The next obs in the MDP traj get their bounds updated as the threshold values.
-                    next_obs_left[
-                        indices, self.X_.shape[1] + valid_features
-                    ] = valid_thresholds
-                    next_obs_right[indices, valid_features] = valid_thresholds
-
-                    # Create Action objects for each split
-                    actions = [Action(split) for split in feat_thresh]
-
-                    # Precompute next states for left and right
-                    # There should be a pair of next_states per tested features.
-                    next_states_left = [
-                        State(next_obs_left[i], lefts[:, i])
-                        for i in range(len(valid_features))
-                    ]
-                    next_states_right = [
-                        State(next_obs_right[i], rights[:, i])
-                        for i in range(len(valid_features))
-                    ]
-
-                    # Perform transitions and append states, the reward is equal to the feature cost.
-                    for i in range(len(valid_features)):
-                        if lefts[:, i].astype(int).sum() > 0:
-                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_left[i], next_states_left[i])
-                            tmp.append(next_states_left[i])
-
-                    for i in range(len(valid_features)):
-                        if rights[:, i].astype(int).sum() > 0:
-                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_right[i], next_states_right[i])
-                            tmp.append(next_states_right[i])
-
-                    [
-                        node.add_action(action)
-                        for action in actions
-                        if action.rewards != []
-                    ]
-
-            if tmp != []:
-                deci_nodes.append(tmp)
-                d += 1
+    def expand_node_(self, node, depth=0):
+        obs = node.obs.copy()
+        classes, counts = np.unique(self.y_[node.nz], return_counts=True)
+        rstar = max(counts) / node.nz.sum() - 1.0
+        astar = classes[np.argmax(counts)]
+        next_state = State(self.terminal_state_, [0], is_terminal=True)
+        a = Action(astar)
+        a.transition([rstar] * self.max_nb_trees, 1, next_state)
+        node.add_action(a)
+        # If there is still depth budget and the current split has more than 1 class:
+        if rstar < 0 and depth < self.max_depth:
+            # Get the splits from CART
+            # Note that that 2 leaf nodes means that the split is greedy.
+            if depth <= len(self.cart_nodes_list) - 1:
+                clf = DecisionTreeClassifier(
+                    max_leaf_nodes=max(2, self.cart_nodes_list[depth]),
+                    random_state=self.random_state,
+                )
+            # If depth budget reaches limit, get the max entropy split.
             else:
-                break
-        return deci_nodes
+                clf = DecisionTreeClassifier(
+                    max_leaf_nodes=2, random_state=self.random_state
+                )
+
+            clf.fit(self.X_[node.nz], self.y_[node.nz])
+
+            # Extract the splits from the CART tree.
+
+            masks = clf.tree_.feature >= 0  # get tested features.
+
+            # Apply mask to features and thresholds to get valid indices
+            valid_features = clf.tree_.feature[masks]
+            valid_thresholds = clf.tree_.threshold[masks]
+            lefts = (
+                self.X_[:, valid_features] <= valid_thresholds
+            )  # is a 2D array with nb CART tree tests columns.
+            rights = np.logical_not(
+                lefts
+            )  # as many rows as data in the whole training set.
+
+            # Masking data passing threshold and precedent thresholds.
+            lefts *= node.nz[:, np.newaxis]
+            rights *= node.nz[:, np.newaxis]
+
+            # Compute probabilities
+            p_left = lefts.sum(axis=0) / node.nz.sum()  # summing column values.
+            # In each column (tested features), non-zero values are data indices passing all tests so far in the MDP trajectory.
+            p_right = 1 - p_left
+
+            feat_thresh = list(
+                zip(valid_features, valid_thresholds)
+            )  # len of the list is nb tests in CART tree.
+
+            # Precompute next observations for left and right splits
+            next_obs_left = np.tile(obs, (len(feat_thresh), 1))
+            next_obs_right = np.tile(obs, (len(feat_thresh), 1))
+            indices = np.arange(len(feat_thresh))
+
+            # Fast next obs computations. The next obs in the MDP traj get their bounds updated as the threshold values.
+            next_obs_left[
+                indices, self.X_.shape[1] + valid_features
+            ] = valid_thresholds
+            next_obs_right[indices, valid_features] = valid_thresholds
+
+            # Create Action objects for each split
+            actions = [Action(split) for split in feat_thresh]
+
+            # Precompute next states for left and right
+            # There should be a pair of next_states per tested features.
+            next_states_left = [
+                State(next_obs_left[i], lefts[:, i])
+                for i in range(len(valid_features))
+            ]
+            next_states_right = [
+                State(next_obs_right[i], rights[:, i])
+                for i in range(len(valid_features))
+            ]
+
+            # Perform transitions and append states, the reward is equal to the feature cost.
+            for i in range(len(valid_features)):
+                if lefts[:, i].astype(int).sum() > 0:
+                    actions[i].transition(self.zetas_ * self.feature_costs_[actions[i].action[0]], p_left[i], next_states_left[i])
+
+            for i in range(len(valid_features)):
+                if rights[:, i].astype(int).sum() > 0:
+                    actions[i].transition(self.zetas_ * self.feature_costs_[actions[i].action[0]], p_right[i], next_states_right[i])
+
+            [node.add_action(action) for action in actions]
+        return
+
+    def recurs_build_mdp_opt_pol_(self, state, depth=0):
+        if not state.is_terminal:
+            self.expand_node_(state, depth)
+            state.qs = np.zeros((len(state.actions), self.max_nb_trees))
+            for a_idx, a in enumerate(state.actions):
+                q = np.zeros(self.max_nb_trees)
+                for s, p in zip(a.next_states, a.probas): # len 2 or 1
+                    self.recurs_build_mdp_opt_pol_(s, depth+1)
+                    q += p * s.qs.max(axis=0)
+                state.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
+                # print(state.qs)
+                del a.next_states
+            idx = np.argmax(state.qs, axis=0) 
+            self.trees_[tuple(state.obs.tolist() + [depth])] = [
+                state.actions[k].action for k in idx
+            ]    
+        else:
+            state.qs = np.zeros((1, self.max_nb_trees))
+        return
 
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y, feature_costs=None):
@@ -296,10 +243,14 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             self.zetas_ = np.linspace(-1, 0, self.max_nb_trees)
             assert len(self.zetas_) == self.max_nb_trees
 
-        
-        self.mdp_ = self.build_mdp()
-        self.init_o_ = self.mdp_[0][0].obs
-        self.trees_ = backward_induction_multiple_zetas(self.mdp_, self.zetas_)
+        root = State(
+            np.concatenate((self.X_.min(axis=0) - 1e-3, self.X_.max(axis=0) + 1e-3)),
+            nz=np.ones(self.X_.shape[0], dtype=np.bool_),
+        )
+        self.init_o_ = root.obs
+        self.terminal_state_ = np.zeros(2 * self.X_.shape[1])
+        self.trees_ = dict()
+        self.recurs_build_mdp_opt_pol_(root, depth=0)
         # Return the classifier
         return self
 
@@ -646,16 +597,19 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
 
                     # Perform transitions and append states, the reward is equal to the feature cost.
                     for i in range(len(valid_features)):
-                        actions[i].transition(self.feature_costs_[actions[i].action[0]], p_left[i], next_states_left[i])
-                        tmp.append(next_states_left[i])
+                        if lefts[:, i].astype(int).sum() > 0:
+                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_left[i], next_states_left[i])
+                            tmp.append(next_states_left[i])
 
                     for i in range(len(valid_features)):
-                        actions[i].transition(self.feature_costs_[actions[i].action[0]], p_right[i], next_states_right[i])
-                        tmp.append(next_states_right[i])
+                        if rights[:, i].astype(int).sum() > 0:
+                            actions[i].transition(self.feature_costs_[actions[i].action[0]], p_right[i], next_states_right[i])
+                            tmp.append(next_states_right[i])
 
                     [
                         node.add_action(action)
                         for action in actions
+                        if action.rewards != []
                     ]
 
             if tmp != []:
