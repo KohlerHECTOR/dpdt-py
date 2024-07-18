@@ -598,21 +598,19 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             ]
 
             # Perform transitions and append states, the reward is equal to the feature cost.
-            for i in range(len(valid_features)):
-                if lefts[:, i].astype(int).sum() > 0:
-                    actions[i].transition(
+            
+            [actions[i].transition(
                         self.zetas_ * self.feature_costs_[actions[i].action[0]],
                         p_left[i],
                         next_states_left[i],
-                    )
+                    ) for i in range(len(valid_features))]
 
-            for i in range(len(valid_features)):
-                if rights[:, i].astype(int).sum() > 0:
-                    actions[i].transition(
-                        self.zetas_ * self.feature_costs_[actions[i].action[0]],
-                        p_right[i],
-                        next_states_right[i],
-                    )
+            
+            [actions[i].transition(
+                self.zetas_ * self.feature_costs_[actions[i].action[0]],
+                p_right[i],
+                next_states_right[i],
+            ) for i in range(len(valid_features))]
 
             [node.add_action(action) for action in actions]
         return

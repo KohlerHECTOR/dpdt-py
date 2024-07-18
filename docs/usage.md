@@ -1,6 +1,6 @@
 ## Installation
 ```bash
-pip install git+https://github.com/KohlerHECTOR/dpdt-py.git@v0.2.1
+pip install git+https://github.com/KohlerHECTOR/dpdt-py.git@v0.2.2
 ```
 
 
