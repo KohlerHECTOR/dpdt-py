@@ -698,7 +698,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
 
         # Store the training data to predict later
         self.X_ = X
-        self.y_ = y
+        self.y_ = y.astype(float)
 
         if self.max_nb_trees < 2:
             self.zetas_ = np.zeros(1)
