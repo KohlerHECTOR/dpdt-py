@@ -9,7 +9,7 @@
 project = "dpdt"
 copyright = "2024, Hector Kohler"
 author = "Hector Kohler"
-release = "0.2.3"
+release = "0.2.4"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

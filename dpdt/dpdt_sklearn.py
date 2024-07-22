@@ -231,9 +231,9 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             self.trees_[tuple(state.obs.tolist() + [depth])] = [
                 state.actions[k].action for k in idx
             ]
+            del state.actions
         else:
             state.qs = np.zeros((1, self.max_nb_trees))
-        del state
         return
 
     @_fit_context(prefer_skip_nested_validation=True)
