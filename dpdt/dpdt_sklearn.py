@@ -640,13 +640,14 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
                 for s, p in zip(a.next_states, a.probas):  # len 2 or 1
                     self.recurs_build_mdp_opt_pol_(s, depth + 1)
                     q += p * s.qs.max(axis=0)
+                    del s
                 state.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
                 # print(state.qs)
-                del a.next_states
             idx = np.argmax(state.qs, axis=0)
             self.trees_[tuple(state.obs.tolist() + [depth])] = [
                 state.actions[k].action for k in idx
             ]
+            del state.actions
         else:
             state.qs = np.zeros((1, self.max_nb_trees))
         return
