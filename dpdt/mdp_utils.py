@@ -15,6 +15,8 @@ class State:
         Indicates if the state is a terminal state.
     """
 
+    __slots__ = ["obs", "actions", "qs", "is_terminal", "nz"]
+
     def __init__(self, label, nz, is_terminal=False):
         self.obs = label
         self.actions = []
@@ -44,6 +46,8 @@ class Action:
     action : object
         The action representation (e.g., a split decision).
     """
+
+    __slots__ = ["action", "rewards", "probas", "next_states"]
 
     def __init__(self, action):
         self.action = action
