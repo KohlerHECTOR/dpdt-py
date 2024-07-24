@@ -1,6 +1,11 @@
 import numpy as np
 
 
+class Policy:
+    def __init__(self, actions):
+        self.actions = actions
+
+
 class State:
     """
     Represents a state in the Markov Decision Process (MDP).
