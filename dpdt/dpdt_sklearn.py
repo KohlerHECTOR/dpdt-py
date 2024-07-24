@@ -11,10 +11,11 @@ from sklearn.utils.validation import check_is_fitted, check_X_y, check_array
 from sklearn.utils._param_validation import Interval
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.metrics import mean_squared_error
-from .mdp_utils import Action, State, Policy
+from .mdp_utils import Action, State
 from numbers import Integral
 
-import weakref
+from copy import copy, deepcopy
+
 
 
 class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
@@ -237,14 +238,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
                     tmp.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
                 idx = np.argmax(tmp.qs, axis=0)
                 to_del = set(np.arange(len(tmp.actions))) - set(idx)
-
-                policy = np.zeros((self.max_nb_trees, 2), dtype=np.float32)
-                for i, k in enumerate(idx):
-                    policy[i, :] = tmp.actions[k].action
-
-                # pol = Policy(policy)
-                self._trees[tuple(tmp.obs.tolist() + [d])] = policy
-                # print(list(self._trees.keys()))
+                self._trees[tuple(tmp.obs.tolist() + [d])] = [deepcopy(tmp.actions[i].action) for i in idx]
 
                 for a_idx in to_del:
                     for s in tmp.actions[a_idx].next_states:
@@ -263,7 +257,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
                 expanded[-1].actions[0].next_states[0].qs = np.zeros(
                     (1, self.max_nb_trees), dtype=np.float32
                 )
-                self._trees[tuple(tmp.obs.tolist() + [d])] = -1 * np.ones(((self.max_nb_trees, 2)), dtype=np.float32)
+                self._trees[tuple(tmp.obs.tolist() + [d])] = None
                 
                 del stack[-1]
 
