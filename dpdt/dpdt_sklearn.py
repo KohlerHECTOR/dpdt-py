@@ -668,33 +668,27 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
         """
         stack = [(self._root, 0)]
         expanded = [None]
-        iter = 0
         while stack:
             tmp, d = stack[-1]
             # print(len(self._trees), len(expanded), len(stack))
             if tmp is expanded[-1]:
                 del expanded[-1]
                 del stack[-1]
-                tmp.qs = np.zeros((len(tmp.actions), self.max_nb_trees))
+                tmp.qs = np.zeros(
+                    (len(tmp.actions), self.max_nb_trees), dtype=np.float32
+                )
                 for a_idx, a in enumerate(tmp.actions):
-                    q = np.zeros(self.max_nb_trees)
+                    q = np.zeros(self.max_nb_trees, dtype=np.float32)
                     for s, p in zip(a.next_states, a.probas):  # len 2 or 1
                         q += p * s.qs.max(axis=0)
                     tmp.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
-                # expanded[-1].qs = foo(ns)
                 idx = np.argmax(tmp.qs, axis=0)
-                # actions_idx_to_del = set(range(len(tmp.actions))) - set(idx)
-                # print(idx)
-                # print(actions_idx_to_del)
+                to_del = set(np.arange(len(tmp.actions))) - set(idx)
+                self._trees[tuple(tmp.obs.tolist() + [d])] = [deepcopy(tmp.actions[i].action) for i in idx]
 
-                self._trees[tuple(tmp.obs.tolist() + [d])] = [
-                    tmp.actions[k].action for k in idx
-                ]  # memory bottleneck
-
-                # for a_idx in actions_idx_to_del:
-                #     for s in tmp.actions[a_idx].next_states:
-                #         self._trees[tuple(s.obs.tolist() + [d + 1])] = None
-                #         del self._trees[tuple(s.obs.tolist() + [d + 1])]
+                for a_idx in to_del:
+                    for s in tmp.actions[a_idx].next_states:
+                        del self._trees[tuple(s.obs.tolist() + [d + 1])]
 
             elif not tmp.is_terminal:
                 tmp = self.expand_node_(tmp, d)
@@ -707,8 +701,10 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             else:  # tmp is a terminal state
                 # do backprop
                 expanded[-1].actions[0].next_states[0].qs = np.zeros(
-                    (1, self.max_nb_trees)
+                    (1, self.max_nb_trees), dtype=np.float32
                 )
+                self._trees[tuple(tmp.obs.tolist() + [d])] = None
+                
                 del stack[-1]
 
     @_fit_context(prefer_skip_nested_validation=True)
