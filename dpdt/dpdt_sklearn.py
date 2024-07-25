@@ -14,7 +14,7 @@ from sklearn.metrics import mean_squared_error
 from .mdp_utils import Action, State
 from numbers import Integral
 
-from copy import copy, deepcopy
+import gc
 
 
 
@@ -114,7 +114,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         rstar = max(counts) / node.nz.sum() - 1.0
         astar = classes[np.argmax(counts)]
         next_state = State(self.terminal_state_, [0], is_terminal=True)
-        a = Action((-1, astar))
+        a = Action(astar)
         a.transition([rstar] * self.max_nb_trees, 1, next_state)
         node.add_action(a)
         # If there is still depth budget and the current split has more than 1 class:
@@ -204,7 +204,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         return node
 
     # @profile
-    def _build_mdp_opt_pol(self):
+    def _build_mdp_opt_pol(self, infinite_memory=False):
         """
         Build the Markov Decision Process (MDP) for the trees.
 
@@ -224,10 +224,8 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         expanded = [None]
         while stack:
             tmp, d = stack[-1]
-            # print(len(self._trees), len(expanded), len(stack))
             if tmp is expanded[-1]:
-                del expanded[-1]
-                del stack[-1]
+
                 tmp.qs = np.zeros(
                     (len(tmp.actions), self.max_nb_trees), dtype=np.float32
                 )
@@ -237,12 +235,21 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
                         q += p * s.qs.max(axis=0)
                     tmp.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
                 idx = np.argmax(tmp.qs, axis=0)
-                to_del = set(np.arange(len(tmp.actions))) - set(idx)
-                self._trees[tuple(tmp.obs.tolist() + [d])] = [deepcopy(tmp.actions[i].action) for i in idx]
 
-                for a_idx in to_del:
-                    for s in tmp.actions[a_idx].next_states:
-                        del self._trees[tuple(s.obs.tolist() + [d + 1])]
+                self._trees[tuple(tmp.obs.tolist() + [d])] = [tmp.actions[i].action for i in idx]
+
+                if infinite_memory:
+                    to_del = set(np.arange(len(tmp.actions))) - set(idx)
+                    for a_idx in to_del:
+                        for s in tmp.actions[a_idx].next_states:
+                            self._trees[tuple(s.obs.tolist() + [d + 1])] = None
+                            del self._trees[tuple(s.obs.tolist() + [d + 1])]
+
+                del expanded[-1]
+                del stack[-1]
+                if infinite_memory:
+                    gc.collect()
+
 
             elif not tmp.is_terminal:
                 tmp = self.expand_node_(tmp, d)
@@ -262,7 +269,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
                 del stack[-1]
 
     @_fit_context(prefer_skip_nested_validation=True)
-    def fit(self, X, y, feature_costs=None):
+    def fit(self, X, y, feature_costs=None, infinite_memory=False):
         """
         Fit the DPDTree classifier.
 
@@ -279,6 +286,9 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             The target values.
         feature_costs (optional): list of float, default=None
             List containing the features costs.
+        infinite_memory (optional): bool, default=None
+            If true force runs garbage collection. This allows to run CART with an infinite number of leave nodes..
+            It will multiply runtime by 500.
 
         Returns
         -------
@@ -325,7 +335,8 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         self.terminal_state_ = np.zeros(2 * self.X_.shape[1])
 
         self._trees = {}
-        self._build_mdp_opt_pol()
+        self._build_mdp_opt_pol(infinite_memory)
+
 
         # self.recurs_build_mdp_opt_pol_(self._root, depth=0)
         # Return the classifier
@@ -377,16 +388,15 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             a = init_a
             o = self._root.obs.copy()
             H = 0
-            while a[0] >= 0:  # a is int implies leaf node
+            while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
-                feature = int(feature)
                 H += 1
                 if x[feature] <= threshold:
                     o[x.shape[0] + feature] = threshold
                 else:
                     o[feature] = threshold
                 a = self._trees[tuple(o.tolist() + [H])][zeta_index]
-            y_pred[i] = a[1]
+            y_pred[i] = a
         return y_pred
 
     def _average_traj_length_in_mdp(self, X, y, zeta_index):
@@ -417,7 +427,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             o = self._root.obs.copy()
             H = 0
             cost = 0
-            while a[0] >= 0:  # a is int implies leaf node
+            while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
                 # feature = int(feature)
                 H += 1
@@ -558,7 +568,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             self.y_[node.nz], np.tile(astar, (len(self.y_[node.nz]), 1))
         )
         next_state = State(self.terminal_state_, [0], is_terminal=True)
-        a = Action((-1, astar))
+        a = Action(astar)
         a.transition([rstar] * self.max_nb_trees, 1, next_state)
         node.add_action(a)
         # If there is still depth budget and the current split has more than 1 class:
@@ -650,7 +660,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             [node.add_action(action) for action in actions]
         return node
 
-    def _build_mdp_opt_pol(self):
+    def _build_mdp_opt_pol(self, infinite_memory=False):
         """
         Build the Markov Decision Process (MDP) for the trees.
 
@@ -672,8 +682,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             tmp, d = stack[-1]
             # print(len(self._trees), len(expanded), len(stack))
             if tmp is expanded[-1]:
-                del expanded[-1]
-                del stack[-1]
+
                 tmp.qs = np.zeros(
                     (len(tmp.actions), self.max_nb_trees), dtype=np.float32
                 )
@@ -683,12 +692,21 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
                         q += p * s.qs.max(axis=0)
                     tmp.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
                 idx = np.argmax(tmp.qs, axis=0)
-                to_del = set(np.arange(len(tmp.actions))) - set(idx)
-                self._trees[tuple(tmp.obs.tolist() + [d])] = [deepcopy(tmp.actions[i].action) for i in idx]
 
-                for a_idx in to_del:
-                    for s in tmp.actions[a_idx].next_states:
-                        del self._trees[tuple(s.obs.tolist() + [d + 1])]
+                self._trees[tuple(tmp.obs.tolist() + [d])] = [tmp.actions[i].action for i in idx]
+
+                if infinite_memory:
+                    to_del = set(np.arange(len(tmp.actions))) - set(idx)
+                    for a_idx in to_del:
+                        for s in tmp.actions[a_idx].next_states:
+                            self._trees[tuple(s.obs.tolist() + [d + 1])] = None
+                            del self._trees[tuple(s.obs.tolist() + [d + 1])]
+
+                del expanded[-1]
+                del stack[-1]
+                if infinite_memory:
+                    gc.collect()
+
 
             elif not tmp.is_terminal:
                 tmp = self.expand_node_(tmp, d)
@@ -708,7 +726,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
                 del stack[-1]
 
     @_fit_context(prefer_skip_nested_validation=True)
-    def fit(self, X, y, feature_costs=None):
+    def fit(self, X, y, feature_costs=None, infinite_memory=False):
         """
         Fit the DPDTree classifier.
 
@@ -725,6 +743,9 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             The target values.
         feature_costs (optional): list of float, default=None
             List containing the features costs.
+        infinite_memory (optional): bool, default=None
+            If true force runs garbage collection. This allows to run CART with an infinite number of leave nodes..
+            It will multiply runtime by 500.
 
         Returns
         -------
@@ -767,7 +788,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
         self.terminal_state_ = np.zeros(2 * self.X_.shape[1])
         self._trees = dict()
         # self.recurs_build_mdp_opt_pol_(root, depth=0)
-        self._build_mdp_opt_pol()
+        self._build_mdp_opt_pol(infinite_memory)
         # Return the classifier
         return self
 
@@ -820,7 +841,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             a = init_a
             o = self._root.obs.copy()
             H = 0
-            while a[0] >= 0:  # a is int implies leaf node
+            while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
                 # feature = int(feature)
                 H += 1
@@ -829,7 +850,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
                 else:
                     o[feature] = threshold
                 a = self._trees[tuple(o.tolist() + [H])][zeta_index]
-            y_pred[i] = a[1]
+            y_pred[i] = a
         return y_pred
 
     def _average_traj_length_in_mdp(self, X, y, zeta_index):
@@ -860,7 +881,7 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             o = self._root.obs.copy()
             H = 0
             cost = 0
-            while a[0] >= 0:  # a is int implies leaf node
+            while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
                 # feature = int(feature)
                 H += 1
