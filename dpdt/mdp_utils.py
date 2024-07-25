@@ -1,6 +1,11 @@
 import numpy as np
 
 
+class Policy:
+    def __init__(self, actions):
+        self.actions = actions
+
+
 class State:
     """
     Represents a state in the Markov Decision Process (MDP).
@@ -14,6 +19,8 @@ class State:
     is_terminal : bool, default=False
         Indicates if the state is a terminal state.
     """
+
+    __slots__ = ["obs", "actions", "qs", "is_terminal", "nz"]
 
     def __init__(self, label, nz, is_terminal=False):
         self.obs = label
@@ -44,6 +51,8 @@ class Action:
     action : object
         The action representation (e.g., a split decision).
     """
+
+    __slots__ = ["action", "rewards", "probas", "next_states"]
 
     def __init__(self, action):
         self.action = action

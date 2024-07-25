@@ -14,6 +14,9 @@ from sklearn.metrics import mean_squared_error
 from .mdp_utils import Action, State
 from numbers import Integral
 
+import gc
+
+
 
 class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
     """
@@ -184,7 +187,7 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             for i in range(len(valid_features)):
                 if lefts[:, i].astype(int).sum() > 0:
                     actions[i].transition(
-                        self.zetas_ * self.feature_costs_[actions[i].action[0]],
+                        self._zetas * self._feature_costs[actions[i].action[0]],
                         p_left[i],
                         next_states_left[i],
                     )
@@ -192,15 +195,16 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             for i in range(len(valid_features)):
                 if rights[:, i].astype(int).sum() > 0:
                     actions[i].transition(
-                        self.zetas_ * self.feature_costs_[actions[i].action[0]],
+                        self._zetas * self._feature_costs[actions[i].action[0]],
                         p_right[i],
                         next_states_right[i],
                     )
 
             [node.add_action(action) for action in actions]
-        return
+        return node
 
-    def recurs_build_mdp_opt_pol_(self, state, depth=0):
+    # @profile
+    def _build_mdp_opt_pol(self, infinite_memory=False):
         """
         Build the Markov Decision Process (MDP) for the trees.
 
@@ -216,28 +220,56 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
 
         .. [1] H. Kohler et. al., "Interpretable Decision Tree Search as a Markov Decision Process" arXiv https://arxiv.org/abs/2309.12701.
         """
-        if not state.is_terminal:
-            self.expand_node_(state, depth)
-            state.qs = np.zeros((len(state.actions), self.max_nb_trees))
-            for a_idx, a in enumerate(state.actions):
-                q = np.zeros(self.max_nb_trees)
-                for s, p in zip(a.next_states, a.probas):  # len 2 or 1
-                    self.recurs_build_mdp_opt_pol_(s, depth + 1)
-                    q += p * s.qs.max(axis=0)
-                    del s
-                state.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
-                # print(state.qs)
-            idx = np.argmax(state.qs, axis=0)
-            self.trees_[tuple(state.obs.tolist() + [depth])] = [
-                state.actions[k].action for k in idx
-            ]
-            del state.actions
-        else:
-            state.qs = np.zeros((1, self.max_nb_trees))
-        return
+        stack = [(self._root, 0)]
+        expanded = [None]
+        while stack:
+            tmp, d = stack[-1]
+            if tmp is expanded[-1]:
+
+                tmp.qs = np.zeros(
+                    (len(tmp.actions), self.max_nb_trees), dtype=np.float32
+                )
+                for a_idx, a in enumerate(tmp.actions):
+                    q = np.zeros(self.max_nb_trees, dtype=np.float32)
+                    for s, p in zip(a.next_states, a.probas):  # len 2 or 1
+                        q += p * s.qs.max(axis=0)
+                    tmp.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
+                idx = np.argmax(tmp.qs, axis=0)
+
+                self._trees[tuple(tmp.obs.tolist() + [d])] = [tmp.actions[i].action for i in idx]
+
+                if infinite_memory:
+                    to_del = set(np.arange(len(tmp.actions))) - set(idx)
+                    for a_idx in to_del:
+                        for s in tmp.actions[a_idx].next_states:
+                            self._trees[tuple(s.obs.tolist() + [d + 1])] = None
+                            del self._trees[tuple(s.obs.tolist() + [d + 1])]
+
+                del expanded[-1]
+                del stack[-1]
+                if infinite_memory:
+                    gc.collect()
+
+
+            elif not tmp.is_terminal:
+                tmp = self.expand_node_(tmp, d)
+                expanded.append(tmp)
+                all_next_states = [
+                    j for sub in [a.next_states for a in tmp.actions] for j in sub
+                ]
+                [stack.append((j, d + 1)) for j in all_next_states]
+
+            else:  # tmp is a terminal state
+                # do backprop
+                expanded[-1].actions[0].next_states[0].qs = np.zeros(
+                    (1, self.max_nb_trees), dtype=np.float32
+                )
+                self._trees[tuple(tmp.obs.tolist() + [d])] = None
+                
+                del stack[-1]
 
     @_fit_context(prefer_skip_nested_validation=True)
-    def fit(self, X, y, feature_costs=None):
+    def fit(self, X, y, feature_costs=None, infinite_memory=False):
         """
         Fit the DPDTree classifier.
 
@@ -254,6 +286,9 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             The target values.
         feature_costs (optional): list of float, default=None
             List containing the features costs.
+        infinite_memory (optional): bool, default=None
+            If true force runs garbage collection. This allows to run CART with an infinite number of leave nodes..
+            It will multiply runtime by 500.
 
         Returns
         -------
@@ -272,9 +307,9 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             min_cost, max_cost = min(feature_costs), max(feature_costs)
             if min_cost == max_cost:
                 feature_costs = [1 for _ in feature_costs]
-            self.feature_costs_ = feature_costs
+            self._feature_costs = feature_costs
         else:
-            self.feature_costs_ = np.ones(X.shape[1])
+            self._feature_costs = np.ones(X.shape[1])
 
         # We need to make sure that we have a classification task
         check_classification_targets(y)
@@ -287,19 +322,23 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         self.y_ = y
 
         if self.max_nb_trees < 2:
-            self.zetas_ = np.zeros(1)
+            self._zetas = np.zeros(1)
         else:
-            self.zetas_ = np.linspace(-1, 0, self.max_nb_trees)
-            assert len(self.zetas_) == self.max_nb_trees
+            self._zetas = np.linspace(-1, 0, self.max_nb_trees)
+            assert len(self._zetas) == self.max_nb_trees
 
-        root = State(
+        self._root = State(
             np.concatenate((self.X_.min(axis=0) - 1e-3, self.X_.max(axis=0) + 1e-3)),
             nz=np.ones(self.X_.shape[0], dtype=np.bool_),
         )
-        self.init_o_ = root.obs
+        # self._root.obs.tolist() = self._root.obs
         self.terminal_state_ = np.zeros(2 * self.X_.shape[1])
-        self.trees_ = dict()
-        self.recurs_build_mdp_opt_pol_(root, depth=0)
+
+        self._trees = {}
+        self._build_mdp_opt_pol(infinite_memory)
+
+
+        # self.recurs_build_mdp_opt_pol_(self._root, depth=0)
         # Return the classifier
         return self
 
@@ -324,9 +363,9 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         # We need to set reset=False because we don't want to overwrite `n_features_in_`
         # `feature_names_in_` but only check that the shape is consistent.
         X = self._validate_data(X, reset=False)
-        return self.predict_zeta_(X, -1)
+        return self._predict_zeta(X, -1)
 
-    def predict_zeta_(self, X, zeta_index):
+    def _predict_zeta(self, X, zeta_index):
         """
         Predict class for X using a specific zeta index.
 
@@ -343,11 +382,11 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             The predicted classes.
         """
         # X = np.array(X, dtype=np.float64)
-        init_a = self.trees_[tuple(self.init_o_.tolist() + [0])][zeta_index]
+        init_a = self._trees[tuple(self._root.obs.tolist() + [0])][zeta_index]
         y_pred = np.zeros(len(X), dtype=self.y_.dtype)
         for i, x in enumerate(X):
             a = init_a
-            o = self.init_o_.copy()
+            o = self._root.obs.copy()
             H = 0
             while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
@@ -356,11 +395,11 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
                     o[x.shape[0] + feature] = threshold
                 else:
                     o[feature] = threshold
-                a = self.trees_[tuple(o.tolist() + [H])][zeta_index]
+                a = self._trees[tuple(o.tolist() + [H])][zeta_index]
             y_pred[i] = a
         return y_pred
 
-    def average_traj_length_in_mdp_(self, X, y, zeta_index):
+    def _average_traj_length_in_mdp(self, X, y, zeta_index):
         """
         Calculate the average trajectory length in the MDP.
 
@@ -381,29 +420,30 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
             The average trajectory length.
         """
         nb_features = X.shape[1]
-        init_a = self.trees_[tuple(self.init_o_.tolist() + [0])][zeta_index]
+        init_a = self._trees[tuple(self._root.obs.tolist() + [0])][zeta_index]
         lengths, costs = np.zeros(X.shape[0]), np.zeros(X.shape[0])
         for i, s in enumerate(X):
             a = init_a
-            o = self.init_o_.copy()
+            o = self._root.obs.copy()
             H = 0
             cost = 0
             while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
+                # feature = int(feature)
                 H += 1
-                cost += self.feature_costs_[feature]
+                cost += self._feature_costs[feature]
                 if s[feature] <= threshold:
                     o[nb_features + feature] = threshold
                 else:
                     o[feature] = threshold
-                a = self.trees_[tuple(o.tolist() + [H])][zeta_index]
+                a = self._trees[tuple(o.tolist() + [H])][zeta_index]
 
             lengths[i] = H
             costs[i] = cost
         return (
             sum(
                 [
-                    self.predict_zeta_(X[i].reshape(1, -1), zeta_index)[0] == y[i]
+                    self._predict_zeta(X[i].reshape(1, -1), zeta_index)[0] == y[i]
                     for i in range(len(X))
                 ]
             )
@@ -430,15 +470,15 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
         decision_path_length : array-like of shape (n_samples)
             The average number of decision nodes traversal in each tree.
         """
-        scores = np.zeros(len(self.zetas_))
-        decision_path_length = np.zeros(len(self.zetas_))
-        cost = np.zeros(len(self.zetas_))
-        for z in range(len(self.zetas_)):
+        scores = np.zeros(len(self._zetas))
+        decision_path_length = np.zeros(len(self._zetas))
+        cost = np.zeros(len(self._zetas))
+        for z in range(len(self._zetas)):
             (
                 scores[z],
                 decision_path_length[z],
                 cost[z],
-            ) = self.average_traj_length_in_mdp_(X, y, z)
+            ) = self._average_traj_length_in_mdp(X, y, z)
         return scores, decision_path_length, cost
 
 
@@ -523,7 +563,6 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
 
         """
         obs = node.obs.copy()
-        classes, counts = np.unique(self.y_[node.nz], return_counts=True)
         astar = self.y_[node.nz].mean(axis=0)
         rstar = -1 * mean_squared_error(
             self.y_[node.nz], np.tile(astar, (len(self.y_[node.nz]), 1))
@@ -599,24 +638,29 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             ]
 
             # Perform transitions and append states, the reward is equal to the feature cost.
-            
-            [actions[i].transition(
-                        self.zetas_ * self.feature_costs_[actions[i].action[0]],
-                        p_left[i],
-                        next_states_left[i],
-                    ) for i in range(len(valid_features))]
 
-            
-            [actions[i].transition(
-                self.zetas_ * self.feature_costs_[actions[i].action[0]],
-                p_right[i],
-                next_states_right[i],
-            ) for i in range(len(valid_features))]
+            [
+                actions[i].transition(
+                    self._zetas * self._feature_costs[actions[i].action[0]],
+                    p_left[i],
+                    next_states_left[i],
+                )
+                for i in range(len(valid_features))
+            ]
+
+            [
+                actions[i].transition(
+                    self._zetas * self._feature_costs[actions[i].action[0]],
+                    p_right[i],
+                    next_states_right[i],
+                )
+                for i in range(len(valid_features))
+            ]
 
             [node.add_action(action) for action in actions]
-        return
+        return node
 
-    def recurs_build_mdp_opt_pol_(self, state, depth=0):
+    def _build_mdp_opt_pol(self, infinite_memory=False):
         """
         Build the Markov Decision Process (MDP) for the trees.
 
@@ -632,27 +676,57 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
 
         .. [1] H. Kohler et. al., "Interpretable Decision Tree Search as a Markov Decision Process" arXiv https://arxiv.org/abs/2309.12701.
         """
-        if not state.is_terminal:
-            self.expand_node_(state, depth)
-            state.qs = np.zeros((len(state.actions), self.max_nb_trees))
-            for a_idx, a in enumerate(state.actions):
-                q = np.zeros(self.max_nb_trees)
-                for s, p in zip(a.next_states, a.probas):  # len 2 or 1
-                    self.recurs_build_mdp_opt_pol_(s, depth + 1)
-                    q += p * s.qs.max(axis=0)
-                state.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
-                # print(state.qs)
-                del a.next_states
-            idx = np.argmax(state.qs, axis=0)
-            self.trees_[tuple(state.obs.tolist() + [depth])] = [
-                state.actions[k].action for k in idx
-            ]
-        else:
-            state.qs = np.zeros((1, self.max_nb_trees))
-        return
+        stack = [(self._root, 0)]
+        expanded = [None]
+        while stack:
+            tmp, d = stack[-1]
+            # print(len(self._trees), len(expanded), len(stack))
+            if tmp is expanded[-1]:
+
+                tmp.qs = np.zeros(
+                    (len(tmp.actions), self.max_nb_trees), dtype=np.float32
+                )
+                for a_idx, a in enumerate(tmp.actions):
+                    q = np.zeros(self.max_nb_trees, dtype=np.float32)
+                    for s, p in zip(a.next_states, a.probas):  # len 2 or 1
+                        q += p * s.qs.max(axis=0)
+                    tmp.qs[a_idx, :] = np.mean(a.rewards, axis=0) + q
+                idx = np.argmax(tmp.qs, axis=0)
+
+                self._trees[tuple(tmp.obs.tolist() + [d])] = [tmp.actions[i].action for i in idx]
+
+                if infinite_memory:
+                    to_del = set(np.arange(len(tmp.actions))) - set(idx)
+                    for a_idx in to_del:
+                        for s in tmp.actions[a_idx].next_states:
+                            self._trees[tuple(s.obs.tolist() + [d + 1])] = None
+                            del self._trees[tuple(s.obs.tolist() + [d + 1])]
+
+                del expanded[-1]
+                del stack[-1]
+                if infinite_memory:
+                    gc.collect()
+
+
+            elif not tmp.is_terminal:
+                tmp = self.expand_node_(tmp, d)
+                expanded.append(tmp)
+                all_next_states = [
+                    j for sub in [a.next_states for a in tmp.actions] for j in sub
+                ]
+                [stack.append((j, d + 1)) for j in all_next_states]
+
+            else:  # tmp is a terminal state
+                # do backprop
+                expanded[-1].actions[0].next_states[0].qs = np.zeros(
+                    (1, self.max_nb_trees), dtype=np.float32
+                )
+                self._trees[tuple(tmp.obs.tolist() + [d])] = None
+                
+                del stack[-1]
 
     @_fit_context(prefer_skip_nested_validation=True)
-    def fit(self, X, y, feature_costs=None):
+    def fit(self, X, y, feature_costs=None, infinite_memory=False):
         """
         Fit the DPDTree classifier.
 
@@ -669,6 +743,9 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             The target values.
         feature_costs (optional): list of float, default=None
             List containing the features costs.
+        infinite_memory (optional): bool, default=None
+            If true force runs garbage collection. This allows to run CART with an infinite number of leave nodes..
+            It will multiply runtime by 500.
 
         Returns
         -------
@@ -689,30 +766,29 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             min_cost, max_cost = min(feature_costs), max(feature_costs)
             if min_cost == max_cost:
                 feature_costs = [1 for _ in feature_costs]
-            self.feature_costs_ = feature_costs
+            self._feature_costs = feature_costs
         else:
-            self.feature_costs_ = np.ones(X.shape[1])
-
-
+            self._feature_costs = np.ones(X.shape[1])
 
         # Store the training data to predict later
         self.X_ = X
         self.y_ = y.astype(float)
 
         if self.max_nb_trees < 2:
-            self.zetas_ = np.zeros(1)
+            self._zetas = np.zeros(1)
         else:
-            self.zetas_ = np.linspace(-1, 0, self.max_nb_trees)
-            assert len(self.zetas_) == self.max_nb_trees
+            self._zetas = np.linspace(-1, 0, self.max_nb_trees)
+            assert len(self._zetas) == self.max_nb_trees
 
-        root = State(
+        self._root = State(
             np.concatenate((self.X_.min(axis=0) - 1e-3, self.X_.max(axis=0) + 1e-3)),
             nz=np.ones(self.X_.shape[0], dtype=np.bool_),
         )
-        self.init_o_ = root.obs
+        # self._root.obs.tolist() = self._root.obs
         self.terminal_state_ = np.zeros(2 * self.X_.shape[1])
-        self.trees_ = dict()
-        self.recurs_build_mdp_opt_pol_(root, depth=0)
+        self._trees = dict()
+        # self.recurs_build_mdp_opt_pol_(root, depth=0)
+        self._build_mdp_opt_pol(infinite_memory)
         # Return the classifier
         return self
 
@@ -737,9 +813,9 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
         # We need to set reset=False because we don't want to overwrite `n_features_in_`
         # `feature_names_in_` but only check that the shape is consistent.
         X = check_array(X)
-        return self.predict_zeta_(X, -1)
+        return self._predict_zeta(X, -1)
 
-    def predict_zeta_(self, X, zeta_index):
+    def _predict_zeta(self, X, zeta_index):
         """
         Predict class for X using a specific zeta index.
 
@@ -756,27 +832,28 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             The predicted classes.
         """
         # X = np.array(X, dtype=np.float64)
-        init_a = self.trees_[tuple(self.init_o_.tolist() + [0])][zeta_index]
+        init_a = self._trees[tuple(self._root.obs.tolist() + [0])][zeta_index]
         if self.y_.ndim > 1:
             y_pred = np.zeros((len(X), self.y_.shape[1]), dtype=self.y_.dtype)
         else:
             y_pred = np.zeros((len(X)), dtype=self.y_.dtype)
         for i, x in enumerate(X):
             a = init_a
-            o = self.init_o_.copy()
+            o = self._root.obs.copy()
             H = 0
             while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
+                # feature = int(feature)
                 H += 1
                 if x[feature] <= threshold:
                     o[x.shape[0] + feature] = threshold
                 else:
                     o[feature] = threshold
-                a = self.trees_[tuple(o.tolist() + [H])][zeta_index]
+                a = self._trees[tuple(o.tolist() + [H])][zeta_index]
             y_pred[i] = a
         return y_pred
 
-    def average_traj_length_in_mdp_(self, X, y, zeta_index):
+    def _average_traj_length_in_mdp(self, X, y, zeta_index):
         """
         Calculate the average trajectory length in the MDP.
 
@@ -797,29 +874,30 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
             The average trajectory length.
         """
         nb_features = X.shape[1]
-        init_a = self.trees_[tuple(self.init_o_.tolist() + [0])][zeta_index]
+        init_a = self._trees[tuple(self._root.obs.tolist() + [0])][zeta_index]
         lengths, costs = np.zeros(X.shape[0]), np.zeros(X.shape[0])
         for i, s in enumerate(X):
             a = init_a
-            o = self.init_o_.copy()
+            o = self._root.obs.copy()
             H = 0
             cost = 0
             while isinstance(a, tuple):  # a is int implies leaf node
                 feature, threshold = a
+                # feature = int(feature)
                 H += 1
-                cost += self.feature_costs_[feature]
+                cost += self._feature_costs[feature]
                 if s[feature] <= threshold:
                     o[nb_features + feature] = threshold
                 else:
                     o[feature] = threshold
-                a = self.trees_[tuple(o.tolist() + [H])][zeta_index]
+                a = self._trees[tuple(o.tolist() + [H])][zeta_index]
 
             lengths[i] = H
             costs[i] = cost
         return (
             np.mean(
                 [
-                    (y[i] - self.predict_zeta_(X[i].reshape(1, -1), zeta_index)[0]) ** 2
+                    (y[i] - self._predict_zeta(X[i].reshape(1, -1), zeta_index)[0]) ** 2
                     for i in range(len(X))
                 ]
             ),
@@ -845,13 +923,13 @@ class DPDTreeRegressor(RegressorMixin, MultiOutputMixin, BaseEstimator):
         decision_path_length : array-like of shape (n_samples)
             The average number of decision nodes traversal in each tree.
         """
-        scores = np.zeros(len(self.zetas_))
-        decision_path_length = np.zeros(len(self.zetas_))
-        cost = np.zeros(len(self.zetas_))
-        for z in range(len(self.zetas_)):
+        scores = np.zeros(len(self._zetas))
+        decision_path_length = np.zeros(len(self._zetas))
+        cost = np.zeros(len(self._zetas))
+        for z in range(len(self._zetas)):
             (
                 scores[z],
                 decision_path_length[z],
                 cost[z],
-            ) = self.average_traj_length_in_mdp_(X, y, z)
+            ) = self._average_traj_length_in_mdp(X, y, z)
         return scores, decision_path_length, cost
