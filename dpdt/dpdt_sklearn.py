@@ -185,20 +185,18 @@ class DPDTreeClassifier(ClassifierMixin, BaseEstimator):
 
             # Perform transitions and append states, the reward is equal to the feature cost.
             for i in range(len(valid_features)):
-                if lefts[:, i].astype(int).sum() > 0:
-                    actions[i].transition(
-                        self._zetas * self._feature_costs[actions[i].action[0]],
-                        p_left[i],
-                        next_states_left[i],
-                    )
+                actions[i].transition(
+                    self._zetas * self._feature_costs[actions[i].action[0]],
+                    p_left[i],
+                    next_states_left[i],
+                )
 
             for i in range(len(valid_features)):
-                if rights[:, i].astype(int).sum() > 0:
-                    actions[i].transition(
-                        self._zetas * self._feature_costs[actions[i].action[0]],
-                        p_right[i],
-                        next_states_right[i],
-                    )
+                actions[i].transition(
+                    self._zetas * self._feature_costs[actions[i].action[0]],
+                    p_right[i],
+                    next_states_right[i],
+                )
 
             [node.add_action(action) for action in actions]
         return node
