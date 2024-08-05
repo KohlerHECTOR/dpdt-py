@@ -35,7 +35,7 @@ assert dpdt.score(X, y) >= cart.score(X, y)
 ### Cite
 
 ```bibtex
-@misc{kohler2024interpretabledecisiontreesearch,
+@misc{interpretabledecisiontreesearch,
       title={Interpretable Decision Tree Search as a Markov Decision Process}, 
       author={Hector Kohler and Riad Akrour and Philippe Preux},
       year={2024},
