@@ -1,0 +1,1363 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dpdt.dpdt_sklearn &#8212; dpdt 0.2.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=cb850272"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/dpdt/dpdt_sklearn';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">DPDTree</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../usage.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/KohlerHECTOR/dpdt-py" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../usage.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/KohlerHECTOR/dpdt-py" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">dpdt.dpdt_sklearn</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for dpdt.dpdt_sklearn</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseEstimator</span><span class="p">,</span>
+    <span class="n">ClassifierMixin</span><span class="p">,</span>
+    <span class="n">_fit_context</span><span class="p">,</span>
+    <span class="n">RegressorMixin</span><span class="p">,</span>
+    <span class="n">MultiOutputMixin</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">check_classification_targets</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span><span class="p">,</span> <span class="n">check_X_y</span><span class="p">,</span> <span class="n">check_array</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">.mdp_utils</span> <span class="kn">import</span> <span class="n">Action</span><span class="p">,</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Integral</span>
+
+<span class="kn">import</span> <span class="nn">gc</span>
+
+
+
+<div class="viewcode-block" id="DPDTreeClassifier">
+<a class="viewcode-back" href="../../generated/dpdt.DPDTreeClassifier.html#dpdt.DPDTreeClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">DPDTreeClassifier</span><span class="p">(</span><span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dynamic Programming Decision Tree (DPDTree) classifier.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_depth : int</span>
+<span class="sd">        The maximum depth of the tree.</span>
+<span class="sd">    max_nb_trees : int, default=1000</span>
+<span class="sd">        The maximum number of trees.</span>
+<span class="sd">    random_state : int, default=42</span>
+<span class="sd">        Fixes randomness of the classifier. Randomness happens in the calls to cart.</span>
+<span class="sd">    cart_nodes_list : list of int, default=(3,)</span>
+<span class="sd">        List containing the number of leaf nodes for the CART trees at each depth.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X_ : ndarray, shape (n_samples, n_features)</span>
+<span class="sd">        The input passed during :meth:`fit`.</span>
+
+<span class="sd">    y_ : ndarray, shape (n_samples,)</span>
+<span class="sd">        The labels passed during :meth:`fit`.</span>
+
+<span class="sd">    classes_ : ndarray, shape (n_classes,)</span>
+<span class="sd">        The classes seen at :meth:`fit`.</span>
+
+<span class="sd">    n_features_in_ : int</span>
+<span class="sd">        Number of features seen during :term:`fit`.</span>
+
+<span class="sd">    feature_names_in_ : ndarray of shape (`n_features_in_`,)</span>
+<span class="sd">        Names of features seen during :term:`fit`. Defined only when `X`</span>
+<span class="sd">        has feature names that are all strings.</span>
+
+<span class="sd">    mdp : list of list of State</span>
+<span class="sd">        The Markov Decision Process represented as a list of lists of states,</span>
+<span class="sd">        where each inner list contains the states at a specific depth.</span>
+
+<span class="sd">    zetas : array-like</span>
+<span class="sd">        Array of zeta values to be used in the computation.</span>
+
+<span class="sd">    trees : dict</span>
+<span class="sd">        A dictionary representing the tree policies. The keys are tuples representing</span>
+<span class="sd">        the state observation and depth, and the values are the optimal tree</span>
+<span class="sd">        for each zeta value.</span>
+
+<span class="sd">    init_o : array-like</span>
+<span class="sd">        The initial observation of the MDP.</span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from dpdt import DPDTreeClassifier</span>
+<span class="sd">    &gt;&gt;&gt; from sklearn import datasets</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; X, y = datasets.load_breast_cancer(return_X_y=True)</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; clf = DPDTreeClassifier(max_depth=3, random_state=42)</span>
+<span class="sd">    &gt;&gt;&gt; clf.fit(X, y)</span>
+<span class="sd">    &gt;&gt;&gt; print(clf.score(X, y))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_parameter_constraints</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;max_nb_trees&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;cart_nodes_list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)],</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_nb_trees</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">cart_nodes_list</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,),</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+    <span class="p">):</span>
+        <span class="c1"># TODO potentially direcltly pass an instantiated CART.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span> <span class="o">=</span> <span class="n">max_nb_trees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cart_nodes_list</span> <span class="o">=</span> <span class="n">cart_nodes_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+
+<div class="viewcode-block" id="DPDTreeClassifier.expand_node_">
+<a class="viewcode-back" href="../../generated/dpdt.DPDTreeClassifier.html#dpdt.DPDTreeClassifier.expand_node_">[docs]</a>
+    <span class="k">def</span> <span class="nf">expand_node_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Node Expansion:</span>
+<span class="sd">            - For each node at the current depth, calculates the unique classes and their counts for the samples in the node (`node.nz`).</span>
+<span class="sd">            - Computes the best possible reward (`rstar`) and the action (`astar`) leading to the next state.</span>
+<span class="sd">            - If further expansion is possible (i.e., depth budget allows and there are at least two classes), initializes a `DecisionTreeClassifier` to determine the splits.</span>
+<span class="sd">            - Fits the classifier on the samples in the node, and identifies potential splits (features and thresholds).</span>
+
+<span class="sd">        Action Creation and Transition:</span>
+<span class="sd">            - For each split, creates an `Action` and determines the left and right child nodes based on the split.</span>
+<span class="sd">            - Creates the left and right nodes as new states, and adds transitions to the action.</span>
+<span class="sd">            - If an action has valid transitions, adds it to the current node.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">classes</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">],</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">rstar</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">/</span> <span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="mf">1.0</span>
+        <span class="n">astar</span> <span class="o">=</span> <span class="n">classes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">counts</span><span class="p">)]</span>
+        <span class="n">next_state</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal_state_</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">is_terminal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">Action</span><span class="p">(</span><span class="n">astar</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">transition</span><span class="p">([</span><span class="n">rstar</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">next_state</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="c1"># If there is still depth budget and the current split has more than 1 class:</span>
+        <span class="k">if</span> <span class="n">rstar</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">depth</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span><span class="p">:</span>
+            <span class="c1"># Get the splits from CART</span>
+            <span class="c1"># Note that that 2 leaf nodes means that the split is greedy.</span>
+            <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cart_nodes_list</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">clf</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span>
+                    <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart_nodes_list</span><span class="p">[</span><span class="n">depth</span><span class="p">]),</span>
+                    <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># If depth budget reaches limit, get the max entropy split.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">clf</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span>
+                    <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+                <span class="p">)</span>
+
+            <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">])</span>
+
+            <span class="c1"># Extract the splits from the CART tree.</span>
+
+            <span class="n">masks</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span> <span class="o">&gt;=</span> <span class="mi">0</span>  <span class="c1"># get tested features.</span>
+
+            <span class="c1"># Apply mask to features and thresholds to get valid indices</span>
+            <span class="n">valid_features</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="n">masks</span><span class="p">]</span>
+            <span class="n">valid_thresholds</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">threshold</span><span class="p">[</span><span class="n">masks</span><span class="p">]</span>
+            <span class="n">lefts</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">[:,</span> <span class="n">valid_features</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">valid_thresholds</span>
+            <span class="p">)</span>  <span class="c1"># is a 2D array with nb CART tree tests columns.</span>
+            <span class="n">rights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span>
+                <span class="n">lefts</span>
+            <span class="p">)</span>  <span class="c1"># as many rows as data in the whole training set.</span>
+
+            <span class="c1"># Masking data passing threshold and precedent thresholds.</span>
+            <span class="n">lefts</span> <span class="o">*=</span> <span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">rights</span> <span class="o">*=</span> <span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+            <span class="c1"># Compute probabilities</span>
+            <span class="n">p_left</span> <span class="o">=</span> <span class="n">lefts</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># summing column values.</span>
+            <span class="c1"># In each column (tested features), non-zero values are data indices passing all tests so far in the MDP trajectory.</span>
+            <span class="n">p_right</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">p_left</span>
+
+            <span class="n">feat_thresh</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="n">valid_features</span><span class="p">,</span> <span class="n">valid_thresholds</span><span class="p">)</span>
+            <span class="p">)</span>  <span class="c1"># len of the list is nb tests in CART tree.</span>
+
+            <span class="c1"># Precompute next observations for left and right splits</span>
+            <span class="n">next_obs_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_thresh</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">next_obs_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_thresh</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_thresh</span><span class="p">))</span>
+
+            <span class="c1"># Fast next obs computations. The next obs in the MDP traj get their bounds updated as the threshold values.</span>
+            <span class="n">next_obs_left</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">valid_features</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_thresholds</span>
+            <span class="n">next_obs_right</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="n">valid_features</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_thresholds</span>
+
+            <span class="c1"># Create Action objects for each split</span>
+            <span class="n">actions</span> <span class="o">=</span> <span class="p">[</span><span class="n">Action</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">feat_thresh</span><span class="p">]</span>
+
+            <span class="c1"># Precompute next states for left and right</span>
+            <span class="c1"># There should be a pair of next_states per tested features.</span>
+            <span class="n">next_states_left</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">State</span><span class="p">(</span><span class="n">next_obs_left</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">lefts</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_features</span><span class="p">))</span>
+            <span class="p">]</span>
+            <span class="n">next_states_right</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">State</span><span class="p">(</span><span class="n">next_obs_right</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rights</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_features</span><span class="p">))</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Perform transitions and append states, the reward is equal to the feature cost.</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_features</span><span class="p">)):</span>
+                <span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span><span class="p">[</span><span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">p_left</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">next_states_left</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_features</span><span class="p">)):</span>
+                <span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span><span class="p">[</span><span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">p_right</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">next_states_right</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="p">)</span>
+
+            <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="n">action</span><span class="p">)</span> <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">node</span></div>
+
+
+    <span class="c1"># @profile</span>
+    <span class="k">def</span> <span class="nf">_build_mdp_opt_pol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infinite_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the Markov Decision Process (MDP) for the trees.</span>
+
+<span class="sd">        This method constructs an MDP using a depth-first search approach. Each node in the tree represents a state in the MDP,</span>
+<span class="sd">        and actions are determined based on potential splits from a decision tree classifier.</span>
+<span class="sd">        This is a depth-first implementation of Algortihm 1 from [1]_ .</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        .. [1] H. Kohler et. al., &quot;Interpretable Decision Tree Search as a Markov Decision Process&quot; arXiv https://arxiv.org/abs/2309.12701.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+        <span class="n">expanded</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="n">tmp</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">tmp</span> <span class="ow">is</span> <span class="n">expanded</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+
+                <span class="n">tmp</span><span class="o">.</span><span class="n">qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                    <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">a_idx</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">):</span>
+                    <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">next_states</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">probas</span><span class="p">):</span>  <span class="c1"># len 2 or 1</span>
+                        <span class="n">q</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">s</span><span class="o">.</span><span class="n">qs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">tmp</span><span class="o">.</span><span class="n">qs</span><span class="p">[</span><span class="n">a_idx</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">rewards</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">q</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">qs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">d</span><span class="p">])]</span> <span class="o">=</span> <span class="p">[</span><span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">action</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">infinite_memory</span><span class="p">:</span>
+                    <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">)))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">a_idx</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="n">a_idx</span><span class="p">]</span><span class="o">.</span><span class="n">next_states</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])]</span>
+
+                <span class="k">del</span> <span class="n">expanded</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">infinite_memory</span><span class="p">:</span>
+                    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">tmp</span><span class="o">.</span><span class="n">is_terminal</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_node_</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+                <span class="n">expanded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+                <span class="n">all_next_states</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">j</span> <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">next_states</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">sub</span>
+                <span class="p">]</span>
+                <span class="p">[</span><span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">all_next_states</span><span class="p">]</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># tmp is a terminal state</span>
+                <span class="c1"># do backprop</span>
+                <span class="n">expanded</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">next_states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">d</span><span class="p">])]</span> <span class="o">=</span> <span class="kc">None</span>
+                
+                <span class="k">del</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="DPDTreeClassifier.fit">
+<a class="viewcode-back" href="../../generated/dpdt.DPDTreeClassifier.html#dpdt.DPDTreeClassifier.fit">[docs]</a>
+    <span class="nd">@_fit_context</span><span class="p">(</span><span class="n">prefer_skip_nested_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">feature_costs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">infinite_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the DPDTree classifier.</span>
+
+<span class="sd">        - Creates a `root` state with the concatenated minimum and maximum values of `self.X_` with slight offsets.</span>
+<span class="sd">        - Initializes a `terminal_state` as an array of zeros with a length of twice the number of features in `self.X_`.</span>
+<span class="sd">        - Initializes the `root` state with all samples (`nz` as an array of `True` values).</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The training input samples.</span>
+<span class="sd">        y : array-like of shape (n_samples,)</span>
+<span class="sd">            The target values.</span>
+<span class="sd">        feature_costs (optional): list of float, default=None</span>
+<span class="sd">            List containing the features costs.</span>
+<span class="sd">        infinite_memory (optional): bool, default=None</span>
+<span class="sd">            If true force runs garbage collection. This allows to run CART with an infinite number of leave nodes..</span>
+<span class="sd">            It will multiply runtime by 500.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : object</span>
+<span class="sd">            Fitted estimator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">feature_costs</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">feature_costs</span><span class="p">)</span> <span class="o">==</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">),</span> <span class="s2">&quot;There should be as much feature costs as features.&quot;</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">fc</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">feature_costs</span><span class="p">]</span>
+            <span class="p">),</span> <span class="s2">&quot;Feature costs must be greater than 1.&quot;</span>
+            <span class="n">min_cost</span><span class="p">,</span> <span class="n">max_cost</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">feature_costs</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">feature_costs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">min_cost</span> <span class="o">==</span> <span class="n">max_cost</span><span class="p">:</span>
+                <span class="n">feature_costs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">feature_costs</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span> <span class="o">=</span> <span class="n">feature_costs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># We need to make sure that we have a classification task</span>
+        <span class="n">check_classification_targets</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># classifier should always store the classes seen during `fit`</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># Store the training data to predict later</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_</span> <span class="o">=</span> <span class="n">y</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-3</span><span class="p">)),</span>
+            <span class="n">nz</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="c1"># self._root.obs.tolist() = self._root.obs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_state_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_mdp_opt_pol</span><span class="p">(</span><span class="n">infinite_memory</span><span class="p">)</span>
+
+
+        <span class="c1"># self.recurs_build_mdp_opt_pol_(self._root, depth=0)</span>
+        <span class="c1"># Return the classifier</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="DPDTreeClassifier.predict">
+<a class="viewcode-back" href="../../generated/dpdt.DPDTreeClassifier.html#dpdt.DPDTreeClassifier.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict class for X.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y_pred : array of shape (n_samples,)</span>
+<span class="sd">            The predicted classes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if fit had been called</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Input validation</span>
+        <span class="c1"># We need to set reset=False because we don&#39;t want to overwrite `n_features_in_`</span>
+        <span class="c1"># `feature_names_in_` but only check that the shape is consistent.</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_zeta</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_predict_zeta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">zeta_index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict class for X using a specific zeta index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+<span class="sd">        zeta_index : int</span>
+<span class="sd">            The index of the zeta value to use for prediction.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y_pred : array of shape (n_samples,)</span>
+<span class="sd">            The predicted classes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># X = np.array(X, dtype=np.float64)</span>
+        <span class="n">init_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">])][</span><span class="n">zeta_index</span><span class="p">]</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">init_a</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>  <span class="c1"># a is int implies leaf node</span>
+                <span class="n">feature</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="n">a</span>
+                <span class="n">H</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                    <span class="n">o</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">o</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">H</span><span class="p">])][</span><span class="n">zeta_index</span><span class="p">]</span>
+            <span class="n">y_pred</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="k">return</span> <span class="n">y_pred</span>
+
+    <span class="k">def</span> <span class="nf">_average_traj_length_in_mdp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">zeta_index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the average trajectory length in the MDP.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+<span class="sd">        y : array-like of shape (n_samples,)</span>
+<span class="sd">            The target values.</span>
+<span class="sd">        zeta_index : int</span>
+<span class="sd">            The zeta value to use for calculation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        accuracy : float</span>
+<span class="sd">            The prediction accuracy.</span>
+<span class="sd">        avg_length : float</span>
+<span class="sd">            The average trajectory length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nb_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">init_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">])][</span><span class="n">zeta_index</span><span class="p">]</span>
+        <span class="n">lengths</span><span class="p">,</span> <span class="n">costs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">init_a</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>  <span class="c1"># a is int implies leaf node</span>
+                <span class="n">feature</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="n">a</span>
+                <span class="c1"># feature = int(feature)</span>
+                <span class="n">H</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                    <span class="n">o</span><span class="p">[</span><span class="n">nb_features</span> <span class="o">+</span> <span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">o</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">H</span><span class="p">])][</span><span class="n">zeta_index</span><span class="p">]</span>
+
+            <span class="n">lengths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span>
+            <span class="n">costs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cost</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">sum</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_predict_zeta</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">zeta_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span>
+            <span class="n">lengths</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+            <span class="n">costs</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="DPDTreeClassifier.get_pareto_front">
+<a class="viewcode-back" href="../../generated/dpdt.DPDTreeClassifier.html#dpdt.DPDTreeClassifier.get_pareto_front">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_pareto_front</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the decision path lengths / test accuracy pareto front of DPDTrees.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+<span class="sd">        y : array-like of shape (n_samples,)</span>
+<span class="sd">            The target values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        scores : array-like of shape (n_samples)</span>
+<span class="sd">            The test accuracies of the trees.</span>
+<span class="sd">        decision_path_length : array-like of shape (n_samples)</span>
+<span class="sd">            The average number of decision nodes traversal in each tree.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">))</span>
+        <span class="n">decision_path_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">))</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">)):</span>
+            <span class="p">(</span>
+                <span class="n">scores</span><span class="p">[</span><span class="n">z</span><span class="p">],</span>
+                <span class="n">decision_path_length</span><span class="p">[</span><span class="n">z</span><span class="p">],</span>
+                <span class="n">cost</span><span class="p">[</span><span class="n">z</span><span class="p">],</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_average_traj_length_in_mdp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">scores</span><span class="p">,</span> <span class="n">decision_path_length</span><span class="p">,</span> <span class="n">cost</span></div>
+</div>
+
+
+
+<span class="k">class</span> <span class="nc">DPDTreeRegressor</span><span class="p">(</span><span class="n">RegressorMixin</span><span class="p">,</span> <span class="n">MultiOutputMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dynamic Programming Decision Tree (DPDTree) regressor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_depth : int</span>
+<span class="sd">        The maximum depth of the tree.</span>
+<span class="sd">    max_nb_trees : int, default=1000</span>
+<span class="sd">        The maximum number of trees.</span>
+<span class="sd">    random_state : int, default=42</span>
+<span class="sd">        Fixes randomness of the classifier. Randomness happens in the calls to cart.</span>
+<span class="sd">    cart_nodes_list : list of int, default=(3,)</span>
+<span class="sd">        List containing the number of leaf nodes for the CART trees at each depth.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X_ : ndarray, shape (n_samples, n_features)</span>
+<span class="sd">        The input passed during :meth:`fit`.</span>
+
+<span class="sd">    y_ : ndarray, shape (n_samples,)</span>
+<span class="sd">        The labels passed during :meth:`fit`.</span>
+
+<span class="sd">    classes_ : ndarray, shape (n_classes,)</span>
+<span class="sd">        The classes seen at :meth:`fit`.</span>
+
+<span class="sd">    n_features_in_ : int</span>
+<span class="sd">        Number of features seen during :term:`fit`.</span>
+
+<span class="sd">    feature_names_in_ : ndarray of shape (`n_features_in_`,)</span>
+<span class="sd">        Names of features seen during :term:`fit`. Defined only when `X`</span>
+<span class="sd">        has feature names that are all strings.</span>
+
+<span class="sd">    mdp : list of list of State</span>
+<span class="sd">        The Markov Decision Process represented as a list of lists of states,</span>
+<span class="sd">        where each inner list contains the states at a specific depth.</span>
+
+<span class="sd">    zetas : array-like</span>
+<span class="sd">        Array of zeta values to be used in the computation.</span>
+
+<span class="sd">    trees : dict</span>
+<span class="sd">        A dictionary representing the tree policies. The keys are tuples representing</span>
+<span class="sd">        the state observation and depth, and the values are the optimal tree</span>
+<span class="sd">        for each zeta value.</span>
+
+<span class="sd">    init_o : array-like</span>
+<span class="sd">        The initial observation of the MDP.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_parameter_constraints</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;max_nb_trees&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;cart_nodes_list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)],</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_nb_trees</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">cart_nodes_list</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,),</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+    <span class="p">):</span>
+        <span class="c1"># TODO potentially direcltly pass an instantiated CART.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span> <span class="o">=</span> <span class="n">max_nb_trees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cart_nodes_list</span> <span class="o">=</span> <span class="n">cart_nodes_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+
+    <span class="k">def</span> <span class="nf">expand_node_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Node Expansion:</span>
+<span class="sd">            - For each node at the current depth, calculates the unique classes and their counts for the samples in the node (`node.nz`).</span>
+<span class="sd">            - Computes the best possible reward (`rstar`) and the action (`astar`) leading to the next state.</span>
+<span class="sd">            - If further expansion is possible (i.e., depth budget allows and there are at least two classes), initializes a `DecisionTreeClassifier` to determine the splits.</span>
+<span class="sd">            - Fits the classifier on the samples in the node, and identifies potential splits (features and thresholds).</span>
+
+<span class="sd">        Action Creation and Transition:</span>
+<span class="sd">            - For each split, creates an `Action` and determines the left and right child nodes based on the split.</span>
+<span class="sd">            - Creates the left and right nodes as new states, and adds transitions to the action.</span>
+<span class="sd">            - If an action has valid transitions, adds it to the current node.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">astar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">rstar</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">mean_squared_error</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">astar</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">]),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">next_state</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal_state_</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">is_terminal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">Action</span><span class="p">(</span><span class="n">astar</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">transition</span><span class="p">([</span><span class="n">rstar</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">next_state</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="c1"># If there is still depth budget and the current split has more than 1 class:</span>
+        <span class="k">if</span> <span class="n">rstar</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">depth</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span><span class="p">:</span>
+            <span class="c1"># Get the splits from CART</span>
+            <span class="c1"># Note that that 2 leaf nodes means that the split is greedy.</span>
+            <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cart_nodes_list</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">clf</span> <span class="o">=</span> <span class="n">DecisionTreeRegressor</span><span class="p">(</span>
+                    <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart_nodes_list</span><span class="p">[</span><span class="n">depth</span><span class="p">]),</span>
+                    <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># If depth budget reaches limit, get the max entropy split.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">clf</span> <span class="o">=</span> <span class="n">DecisionTreeRegressor</span><span class="p">(</span>
+                    <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+                <span class="p">)</span>
+
+            <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">])</span>
+
+            <span class="c1"># Extract the splits from the CART tree.</span>
+
+            <span class="n">masks</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span> <span class="o">&gt;=</span> <span class="mi">0</span>  <span class="c1"># get tested features.</span>
+
+            <span class="c1"># Apply mask to features and thresholds to get valid indices</span>
+            <span class="n">valid_features</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="n">masks</span><span class="p">]</span>
+            <span class="n">valid_thresholds</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">threshold</span><span class="p">[</span><span class="n">masks</span><span class="p">]</span>
+            <span class="n">lefts</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">[:,</span> <span class="n">valid_features</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">valid_thresholds</span>
+            <span class="p">)</span>  <span class="c1"># is a 2D array with nb CART tree tests columns.</span>
+            <span class="n">rights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span>
+                <span class="n">lefts</span>
+            <span class="p">)</span>  <span class="c1"># as many rows as data in the whole training set.</span>
+
+            <span class="c1"># Masking data passing threshold and precedent thresholds.</span>
+            <span class="n">lefts</span> <span class="o">*=</span> <span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">rights</span> <span class="o">*=</span> <span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+            <span class="c1"># Compute probabilities</span>
+            <span class="n">p_left</span> <span class="o">=</span> <span class="n">lefts</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">node</span><span class="o">.</span><span class="n">nz</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># summing column values.</span>
+            <span class="c1"># In each column (tested features), non-zero values are data indices passing all tests so far in the MDP trajectory.</span>
+            <span class="n">p_right</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">p_left</span>
+
+            <span class="n">feat_thresh</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="n">valid_features</span><span class="p">,</span> <span class="n">valid_thresholds</span><span class="p">)</span>
+            <span class="p">)</span>  <span class="c1"># len of the list is nb tests in CART tree.</span>
+
+            <span class="c1"># Precompute next observations for left and right splits</span>
+            <span class="n">next_obs_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_thresh</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">next_obs_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_thresh</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_thresh</span><span class="p">))</span>
+
+            <span class="c1"># Fast next obs computations. The next obs in the MDP traj get their bounds updated as the threshold values.</span>
+            <span class="n">next_obs_left</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">valid_features</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_thresholds</span>
+            <span class="n">next_obs_right</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="n">valid_features</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_thresholds</span>
+
+            <span class="c1"># Create Action objects for each split</span>
+            <span class="n">actions</span> <span class="o">=</span> <span class="p">[</span><span class="n">Action</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">feat_thresh</span><span class="p">]</span>
+
+            <span class="c1"># Precompute next states for left and right</span>
+            <span class="c1"># There should be a pair of next_states per tested features.</span>
+            <span class="n">next_states_left</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">State</span><span class="p">(</span><span class="n">next_obs_left</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">lefts</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_features</span><span class="p">))</span>
+            <span class="p">]</span>
+            <span class="n">next_states_right</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">State</span><span class="p">(</span><span class="n">next_obs_right</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rights</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_features</span><span class="p">))</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Perform transitions and append states, the reward is equal to the feature cost.</span>
+
+            <span class="p">[</span>
+                <span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span><span class="p">[</span><span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">p_left</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">next_states_left</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_features</span><span class="p">))</span>
+            <span class="p">]</span>
+
+            <span class="p">[</span>
+                <span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span><span class="p">[</span><span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">p_right</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">next_states_right</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_features</span><span class="p">))</span>
+            <span class="p">]</span>
+
+            <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="n">action</span><span class="p">)</span> <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">node</span>
+
+    <span class="k">def</span> <span class="nf">_build_mdp_opt_pol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infinite_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the Markov Decision Process (MDP) for the trees.</span>
+
+<span class="sd">        This method constructs an MDP using a depth-first search approach. Each node in the tree represents a state in the MDP,</span>
+<span class="sd">        and actions are determined based on potential splits from a decision tree classifier.</span>
+<span class="sd">        This is a depth-first implementation of Algortihm 1 from [1]_ .</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        .. [1] H. Kohler et. al., &quot;Interpretable Decision Tree Search as a Markov Decision Process&quot; arXiv https://arxiv.org/abs/2309.12701.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+        <span class="n">expanded</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="n">tmp</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># print(len(self._trees), len(expanded), len(stack))</span>
+            <span class="k">if</span> <span class="n">tmp</span> <span class="ow">is</span> <span class="n">expanded</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+
+                <span class="n">tmp</span><span class="o">.</span><span class="n">qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                    <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">a_idx</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">):</span>
+                    <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">next_states</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">probas</span><span class="p">):</span>  <span class="c1"># len 2 or 1</span>
+                        <span class="n">q</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">s</span><span class="o">.</span><span class="n">qs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">tmp</span><span class="o">.</span><span class="n">qs</span><span class="p">[</span><span class="n">a_idx</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">rewards</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">q</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">qs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">d</span><span class="p">])]</span> <span class="o">=</span> <span class="p">[</span><span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">action</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">infinite_memory</span><span class="p">:</span>
+                    <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">)))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">a_idx</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="n">a_idx</span><span class="p">]</span><span class="o">.</span><span class="n">next_states</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])]</span>
+
+                <span class="k">del</span> <span class="n">expanded</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">infinite_memory</span><span class="p">:</span>
+                    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">tmp</span><span class="o">.</span><span class="n">is_terminal</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_node_</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+                <span class="n">expanded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+                <span class="n">all_next_states</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">j</span> <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">next_states</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tmp</span><span class="o">.</span><span class="n">actions</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">sub</span>
+                <span class="p">]</span>
+                <span class="p">[</span><span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">all_next_states</span><span class="p">]</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># tmp is a terminal state</span>
+                <span class="c1"># do backprop</span>
+                <span class="n">expanded</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">next_states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">d</span><span class="p">])]</span> <span class="o">=</span> <span class="kc">None</span>
+                
+                <span class="k">del</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@_fit_context</span><span class="p">(</span><span class="n">prefer_skip_nested_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">feature_costs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">infinite_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the DPDTree classifier.</span>
+
+<span class="sd">        - Creates a `root` state with the concatenated minimum and maximum values of `self.X_` with slight offsets.</span>
+<span class="sd">        - Initializes a `terminal_state` as an array of zeros with a length of twice the number of features in `self.X_`.</span>
+<span class="sd">        - Initializes the `root` state with all samples (`nz` as an array of `True` values).</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The training input samples.</span>
+<span class="sd">        y : array-like of shape (n_samples,)</span>
+<span class="sd">            The target values.</span>
+<span class="sd">        feature_costs (optional): list of float, default=None</span>
+<span class="sd">            List containing the features costs.</span>
+<span class="sd">        infinite_memory (optional): bool, default=None</span>
+<span class="sd">            If true force runs garbage collection. This allows to run CART with an infinite number of leave nodes..</span>
+<span class="sd">            It will multiply runtime by 500.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : object</span>
+<span class="sd">            Fitted estimator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y_numeric</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_n_features</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">feature_costs</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">feature_costs</span><span class="p">)</span> <span class="o">==</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">),</span> <span class="s2">&quot;There should be as much feature costs as features.&quot;</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">fc</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">feature_costs</span><span class="p">]</span>
+            <span class="p">),</span> <span class="s2">&quot;Feature costs must be greater than 1.&quot;</span>
+            <span class="n">min_cost</span><span class="p">,</span> <span class="n">max_cost</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">feature_costs</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">feature_costs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">min_cost</span> <span class="o">==</span> <span class="n">max_cost</span><span class="p">:</span>
+                <span class="n">feature_costs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">feature_costs</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span> <span class="o">=</span> <span class="n">feature_costs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Store the training data to predict later</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_nb_trees</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-3</span><span class="p">)),</span>
+            <span class="n">nz</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="c1"># self._root.obs.tolist() = self._root.obs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_state_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="c1"># self.recurs_build_mdp_opt_pol_(root, depth=0)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_mdp_opt_pol</span><span class="p">(</span><span class="n">infinite_memory</span><span class="p">)</span>
+        <span class="c1"># Return the classifier</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict class for X.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y_pred : array of shape (n_samples,)</span>
+<span class="sd">            The predicted classes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if fit had been called</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Input validation</span>
+        <span class="c1"># We need to set reset=False because we don&#39;t want to overwrite `n_features_in_`</span>
+        <span class="c1"># `feature_names_in_` but only check that the shape is consistent.</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_zeta</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_predict_zeta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">zeta_index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict class for X using a specific zeta index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+<span class="sd">        zeta_index : int</span>
+<span class="sd">            The index of the zeta value to use for prediction.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y_pred : array of shape (n_samples,)</span>
+<span class="sd">            The predicted classes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># X = np.array(X, dtype=np.float64)</span>
+        <span class="n">init_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">])][</span><span class="n">zeta_index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">init_a</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>  <span class="c1"># a is int implies leaf node</span>
+                <span class="n">feature</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="n">a</span>
+                <span class="c1"># feature = int(feature)</span>
+                <span class="n">H</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                    <span class="n">o</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">o</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">H</span><span class="p">])][</span><span class="n">zeta_index</span><span class="p">]</span>
+            <span class="n">y_pred</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="k">return</span> <span class="n">y_pred</span>
+
+    <span class="k">def</span> <span class="nf">_average_traj_length_in_mdp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">zeta_index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the average trajectory length in the MDP.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+<span class="sd">        y : array-like of shape (n_samples,)</span>
+<span class="sd">            The target values.</span>
+<span class="sd">        zeta_index : int</span>
+<span class="sd">            The zeta value to use for calculation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        accuracy : float</span>
+<span class="sd">            The prediction accuracy.</span>
+<span class="sd">        avg_length : float</span>
+<span class="sd">            The average trajectory length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nb_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">init_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">])][</span><span class="n">zeta_index</span><span class="p">]</span>
+        <span class="n">lengths</span><span class="p">,</span> <span class="n">costs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">init_a</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>  <span class="c1"># a is int implies leaf node</span>
+                <span class="n">feature</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="n">a</span>
+                <span class="c1"># feature = int(feature)</span>
+                <span class="n">H</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_costs</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                    <span class="n">o</span><span class="p">[</span><span class="n">nb_features</span> <span class="o">+</span> <span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">o</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trees</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">H</span><span class="p">])][</span><span class="n">zeta_index</span><span class="p">]</span>
+
+            <span class="n">lengths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span>
+            <span class="n">costs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cost</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_zeta</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">zeta_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+                <span class="p">]</span>
+            <span class="p">),</span>
+            <span class="n">lengths</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+            <span class="n">costs</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_pareto_front</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the decision path lengths / test accuracy pareto front of DPDTrees.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+<span class="sd">        y : array-like of shape (n_samples,)</span>
+<span class="sd">            The target values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        scores : array-like of shape (n_samples)</span>
+<span class="sd">            The test accuracies of the trees.</span>
+<span class="sd">        decision_path_length : array-like of shape (n_samples)</span>
+<span class="sd">            The average number of decision nodes traversal in each tree.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">))</span>
+        <span class="n">decision_path_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">))</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zetas</span><span class="p">)):</span>
+            <span class="p">(</span>
+                <span class="n">scores</span><span class="p">[</span><span class="n">z</span><span class="p">],</span>
+                <span class="n">decision_path_length</span><span class="p">[</span><span class="n">z</span><span class="p">],</span>
+                <span class="n">cost</span><span class="p">[</span><span class="n">z</span><span class="p">],</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_average_traj_length_in_mdp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">scores</span><span class="p">,</span> <span class="n">decision_path_length</span><span class="p">,</span> <span class="n">cost</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Hector Kohler.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

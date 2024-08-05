@@ -1,0 +1,12 @@
+﻿:mod:`dpdt`.DPDTreeClassifier.get_pareto_front
+===========================================================
+
+.. currentmodule:: dpdt
+
+.. autofunction:: DPDTreeClassifier.get_pareto_front
+
+.. include:: dpdt.DPDTreeClassifier.get_pareto_front.examples
+
+.. raw:: html
+
+    <div class="clearer"></div>

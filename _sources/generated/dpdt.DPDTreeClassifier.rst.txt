@@ -1,0 +1,12 @@
+﻿:mod:`dpdt`.DPDTreeClassifier
+====================================
+
+.. currentmodule:: dpdt
+
+.. autoclass:: DPDTreeClassifier
+
+.. include:: dpdt.DPDTreeClassifier.examples
+
+.. raw:: html
+
+    <div class="clearer"></div>
